@@ -9,3 +9,8 @@
 2.抽象现有代码生成，做成可配置化，支持更多前端框架；<br>
 3.抽象封装更多后台服务。<br>
 4.支持界面配置、生成、预览等功能。需另起项目开发。<br>
+
+###kungfu-v0.0.3###
+10001：generator 结构升级，将上个版本的拆分成两个主要是ModelAPI/Server/Controller/WebPage的差异化；<br>
+10002：generator 修改：bjui单独拆出来;<br>
+10003：generator 新增：jquery easyui;<br>
