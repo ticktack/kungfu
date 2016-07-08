@@ -11,5 +11,5 @@
 4.支持界面配置、生成、预览等功能。需另起项目开发。<br>
 
 阶段性成果：<br>
-1.generator重构，目前支持前端框架有bjui,jquery easyui;
-2. ······
+1.generator重构，目前支持前端框架有bjui,jquery easyui;<br>
+2. ······<br>
