@@ -29,5 +29,15 @@ public class Constants {
         public static final String POST = "post";
     }
 
- 
+    public static String SUCCESS_MASSAGE = "success";
+    public static String ERROR_MASSAGE = "error";
+	
+    public static String SUCCESS_SAVE = "成功保存记录";
+    public static String SUCCESS_UPDATE = "成功修改记录";
+    public static String SUCCESS_DELETE = "成功删除记录";
+	
+	
+    public static String ERROR_SAVE = "保存记录出错";
+    public static String ERROR_UPDATE = "修改记录出错";
+    public static String ERROR_DELETE = "删除记录出错";
 }

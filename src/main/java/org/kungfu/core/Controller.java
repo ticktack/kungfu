@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.ehcache.CacheKit;
 
 /**
@@ -153,4 +154,18 @@ public class Controller extends com.jfinal.core.Controller {
   		}
   		return resultList;
   	}
+    
+	public Map<String, Object> getEasyUIPageJson(Page<?> page) {
+		
+		Map<String, Object> easyUIPageJson = new HashMap<String, Object>();
+		easyUIPageJson.put("rows", page.getList());
+		easyUIPageJson.put("pageNumber", page.getPageNumber());
+		easyUIPageJson.put("pageSize", page.getPageSize());
+		easyUIPageJson.put("totalPage", page.getTotalPage());
+		easyUIPageJson.put("total", page.getTotalRow());
+		easyUIPageJson.put("firstPage", page.isFirstPage());
+		easyUIPageJson.put("lastPage", page.isLastPage());
+		
+		return easyUIPageJson;
+	}
 }
