@@ -114,7 +114,7 @@ public class WebPageGenerator {
 			String controlType = "textbox";
 			String dataOptions = ""; // required:true,validType:'number'
 			if (columnMeta.type.contains("(") && columnMeta.type.contains(")") && org.kungfu.util.StrKit.hasDigit(columnMeta.type))
-				isTextArea = Integer.parseInt(columnMeta.type.substring(columnMeta.type.indexOf('(')+1, columnMeta.type.indexOf(')'))) >= 200;
+				isTextArea = Integer.parseInt(columnMeta.type.substring(columnMeta.type.indexOf('(')+1, columnMeta.type.indexOf(')'))) >= 128;
 			if (isTextArea) {
 				if (StrKit.isBlank(dataOptions)) {
 					dataOptions += "multiline:true,height:66";
