@@ -18,7 +18,7 @@ public class ServiceGenerator {
 	protected String packageTemplate =
 			"package %s.%s;%n%n";
 	protected String importTemplate =
-			"import java.util.Date;%n%n" +
+			//"import java.util.Date;%n%n" +
 			"import com.jfinal.plugin.activerecord.Page;%n%n" +
 			"import org.kungfu.core.Service;%n%n" +
 			"import %s.%s.%s;%n%n";

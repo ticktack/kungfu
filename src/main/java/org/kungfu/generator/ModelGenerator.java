@@ -16,7 +16,7 @@ public class ModelGenerator {
 	protected String packageTemplate =
 			"package %s.%s;%n%n";
 	protected String importTemplate =
-			"import com.jfinal.plugin.activerecord.Db;%n" +
+			//"import com.jfinal.plugin.activerecord.Db;%n" +
 			"import com.jfinal.plugin.activerecord.Page;%n%n" +
 			"import %s.%s.%s;%n%n";
 	protected String classDefineTemplate =

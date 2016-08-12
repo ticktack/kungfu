@@ -30,7 +30,7 @@ public class RoutesGenerator {
 			"\tpublic void config() {%n" ; 
 			//"\t\tadd(\"/\", IndexController.class, \"/module\");%n";;
 	protected String configMethodContentTemplate =
-				"\t\tadd(\"/%s\", %sController.class, \"/module/%s\");%n";
+				"\t\tadd(\"/%s\", %sController.class, \"/views/%s\");%n";
 	
 	protected String routesPackageName;
 	protected String routesOutputDir;
