@@ -12,3 +12,15 @@ Kungfu Framework is a simple and lightweight Java web framework built for rapid 
 [10001]：generator 结构升级，将上个版本的拆分成两个主要是ModelAPI/Server/Controller/WebPage的差异化；<br>
 [10002]：generator 修改：bjui前端页面生成单独拆出来，方便基于其他前端框架的页面生成的扩展;<br>
 [10003]：generator 新增：jquery easyui前端页面生成，相关使用方法后期会以文章及开源Demo形式说明使用方法;<br>
+
+
+###依赖引用###
+使用方法：
+<dependency>
+    <groupId>com.github.ticktack</groupId>
+    <artifactId>kungfu</artifactId>
+    <version>0.0.3</version>
+</dependency>
+ 
+maven中央库位置：
+http://mvnrepository.com/artifact/com.github.ticktack/kungfu
