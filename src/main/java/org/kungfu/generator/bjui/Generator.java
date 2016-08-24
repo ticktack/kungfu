@@ -91,6 +91,13 @@ public class Generator {
 	/**
 	 * 使用指定 BaseModelGenerator、ModelGenerator 构造 Generator 
 	 * 生成 BaseModel、Model、MappingKit 三类文件，其中 MappingKit 输出目录与包名与 Model相同
+	 * @param dataSource
+	 * @param baseModelGenerator
+	 * @param modelGenerator
+	 * @param modelAPIGenerator
+	 * @param serviceGenerator
+	 * @param controllerGenerator
+	 * @param webPageGenerator
 	 */
 	public Generator(DataSource dataSource, BaseModelGenerator baseModelGenerator, ModelGenerator modelGenerator, ModelAPIGenerator modelAPIGenerator, ServiceGenerator serviceGenerator, ControllerGenerator controllerGenerator, WebPageGenerator webPageGenerator) {
 		if (dataSource == null) {
