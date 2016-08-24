@@ -16,11 +16,13 @@ Kungfu Framework is a simple and lightweight Java web framework built for rapid 
 
 ###依赖引用###
 使用方法：
+```
 <dependency>
     <groupId>com.github.ticktack</groupId>
     <artifactId>kungfu</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.2</version>
 </dependency>
+```
  
 maven中央库位置：
 http://mvnrepository.com/artifact/com.github.ticktack/kungfu
