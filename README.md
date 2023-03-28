@@ -14,7 +14,7 @@ Kungfu Framework is a simple and lightweight Java web framework built for rapid 
 <dependency>
     <groupId>com.github.ticktack</groupId>
     <artifactId>kungfu</artifactId>
-    <version>5.0.0</version>
+    <version>1.0.0</version>
 </dependency>
 ```
  
