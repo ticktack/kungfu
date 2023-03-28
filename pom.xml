@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.ticktack</groupId>
   <artifactId>kungfu</artifactId>
-  <version>5.0.0</version>
+  <version>1.0.0</version>
   
    <name>${project.groupId}:${project.artifactId}</name>
    <description>a rest framework, base on JFinal.</description>
@@ -95,7 +95,7 @@
     <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.13</version>
+        <version>1.6.3</version>
         <extensions>true</extensions>
         <configuration>
             <serverId>ossrh</serverId>
@@ -106,7 +106,7 @@
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>2.10.3</version>
         <executions>
             <execution>
                 <id>attach-javadocs</id>
@@ -131,7 +131,7 @@
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>1.6</version>
         <executions>
             <execution>
                 <id>sign-artifacts</id>
