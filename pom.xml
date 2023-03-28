@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.ticktack</groupId>
   <artifactId>kungfu</artifactId>
-  <version>0.0.5</version>
+  <version>5.0.0</version>
   
    <name>${project.groupId}:${project.artifactId}</name>
    <description>a rest framework, base on JFinal.</description>
@@ -52,31 +52,8 @@
   
   <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jfinal-version>2.2</jfinal-version>
-		
-		<rest-version>1.1.0</rest-version>
-		
-		<mysql-version>5.1.20</mysql-version>
-		<druid-version>1.0.18</druid-version>
-		<c3p0-version>0.9.5.1</c3p0-version>
-		<ehcache-version>2.6.6</ehcache-version>
-		<jedis-version>2.7.2</jedis-version>
-		<freemarker-version>2.3.21</freemarker-version>
-		
-		
-		<beanutils-version>1.9.2</beanutils-version>
-		<fastjson-version>1.2.10</fastjson-version>
-		<jackson-core-version>2.7.0</jackson-core-version>
-		<jackson-databind-version>2.7.0</jackson-databind-version>
-		<commons-io-version>2.4</commons-io-version>
-		<commons-pool-version>1.6</commons-pool-version>
-		<objenesis-version>2.1</objenesis-version>
-		<fst-version>2.29</fst-version>
-		<guava-verison>18.0</guava-verison>
-	  	<commons-lang3>3.4</commons-lang3>
-		
-		<log4j-version>1.2.17</log4j-version>
-		<slf4j-version>1.6.1</slf4j-version>
+		<jfinal-version>5.0.8</jfinal-version>
+        <fastjson-version>1.2.54</fastjson-version>
 	</properties>
 
 	<dependencies>
@@ -86,128 +63,31 @@
 			<artifactId>jfinal</artifactId>
 			<version>${jfinal-version}</version>
 		</dependency>
-		
-		<!-- rest -->
-		<dependency>
-			<groupId>cn.dreampie</groupId>
-			<artifactId>resty-client</artifactId>
-			<version>${rest-version}</version>
-		</dependency>
-		
-		<!-- mysql -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>${mysql-version}</version>
-		</dependency>
-		
-		<!-- jdbc pool -->
-		<dependency>
-			<groupId>com.mchange</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>${c3p0-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>druid</artifactId>
-			<version>${druid-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
-			<version>${commons-pool-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.objenesis</groupId>
-			<artifactId>objenesis</artifactId>
-			<version>${objenesis-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>de.ruedigermoeller</groupId>
-			<artifactId>fst</artifactId>
-			<version>${fst-version}</version>
-		</dependency>
-		
-		
-		<!-- cache -->
-		<dependency>
-			<groupId>net.sf.ehcache</groupId>
-			<artifactId>ehcache-core</artifactId>
-			<version>${ehcache-version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>${jedis-version}</version>
-		</dependency>
-		
-		<!-- template language -->
-		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-			<version>${freemarker-version}</version>
-		</dependency>
-		
-		<!-- tools -->
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>${commons-io-version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-			<version>${beanutils-version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>${guava-verison}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-			<version>${fastjson-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>${jackson-core-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson-databind-version}</version>
-		</dependency>
 
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>${commons-lang3}</version>
-		</dependency>
-		
-		<!-- log4j -->
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>${log4j-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j-version}</version>
-		</dependency>
-	
-		<!-- <dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
-		</dependency> -->
+        <dependency>
+            <groupId>com.jfinal</groupId>
+            <artifactId>jfinal-undertow</artifactId>
+            <version>3.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.8.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lastB7</groupId>
+            <artifactId>jfinal-swagger-knife4j</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
 	</dependencies>
  
   <build>
@@ -215,7 +95,7 @@
     <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.3</version>
+        <version>1.6.13</version>
         <extensions>true</extensions>
         <configuration>
             <serverId>ossrh</serverId>
@@ -226,7 +106,7 @@
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
+        <version>3.3.0</version>
         <executions>
             <execution>
                 <id>attach-javadocs</id>
@@ -251,7 +131,7 @@
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
+        <version>3.0.1</version>
         <executions>
             <execution>
                 <id>sign-artifacts</id>
@@ -262,7 +142,15 @@
             </execution>
         </executions>
     </plugin>
-</plugins>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+              <source>8</source>
+              <target>8</target>
+          </configuration>
+      </plugin>
+  </plugins>
 
 </build>
 </project>

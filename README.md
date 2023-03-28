@@ -2,7 +2,7 @@
 Kungfu Framework is a simple and lightweight Java web framework built for rapid development. full support rest.
 
 ##Features##
-1. Can build both single project and api/service/web style project.
+1. Can build jfinal restful api project.
 2. Embedded code generation capability. help you to achieve speed development.
 3. Support dynamic native SQL.
 4. Provide utility set.
@@ -20,7 +20,7 @@ Kungfu Framework is a simple and lightweight Java web framework built for rapid 
 <dependency>
     <groupId>com.github.ticktack</groupId>
     <artifactId>kungfu</artifactId>
-    <version>0.0.3</version>
+    <version>5.0.0</version>
 </dependency>
 ```
  
