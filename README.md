@@ -11,11 +11,12 @@ A library for building RESTful web services specifically designed for use with J
 使用方法：
 ```
 <dependency>
-    <groupId>com.github.ticktack</groupId>
-    <artifactId>kungfu</artifactId>
-    <version>1.0.0</version>
+  <groupId>io.github.ticktack</groupId>
+  <artifactId>kungfu</artifactId>
+  <version>1.0.0</version>
 </dependency>
+
 ```
  
 maven中央库位置：
-http://mvnrepository.com/artifact/com.github.ticktack/kungfu
+http://mvnrepository.com/artifact/io.github.ticktack/kungfu
