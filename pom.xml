@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.github.ticktack</groupId>
+  <groupId>io.github.ticktack</groupId>
   <artifactId>kungfu</artifactId>
   <version>1.0.0</version>
   
    <name>${project.groupId}:${project.artifactId}</name>
-   <description>a rest framework, base on JFinal.</description>
+   <description>A library for building RESTful web services specifically designed for use with JFinal.</description>
    <url>https://github.com/ticktack/kungfu.git</url>
    
    <issueManagement>
@@ -21,7 +21,7 @@
    <developers>
     <developer>
       <id>kungfu</id>
-      <name>xiaofeixiang</name>
+      <name>ticktack</name>
       <email>yfq2010@gmail.com</email>
       <url>http://www.65ing.com</url>
     </developer>
@@ -37,16 +37,16 @@
 		<artifactId>oss-parent</artifactId>
 		<version>7</version>
 	</parent> -->
-	
+
 	<distributionManagement>
 	    <snapshotRepository>
 	        <id>ossrh</id>
-	        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	        <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
 	    </snapshotRepository>
 	    <repository>
 	        <id>ossrh</id>
 	        <name>Maven Central Staging Repository</name>
-	        <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+	        <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 	    </repository>
 	</distributionManagement>
   
@@ -91,22 +91,38 @@
 	</dependencies>
  
   <build>
-  <plugins>
-    <plugin>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>3.8.1</version>
+              <configuration>
+                  <source>1.8</source>
+                  <target>1.8</target>
+                  <encoding>UTF-8</encoding>
+                  <!-- <compilerArgs><arg>-parameters</arg></compilerArgs> -->
+              </configuration>
+          </plugin>
+          <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.3</version>
+        <version>1.6.8</version>
         <extensions>true</extensions>
         <configuration>
             <serverId>ossrh</serverId>
-            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
             <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
     </plugin>
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
+        <version>2.10.4</version>
+        <configuration>
+            <!-- 解决 java8  发布到 maven 异常 -->
+            <additionalparam>-Xdoclint:none</additionalparam>
+            <encoding>UTF-8</encoding>
+        </configuration>
         <executions>
             <execution>
                 <id>attach-javadocs</id>
@@ -142,14 +158,15 @@
             </execution>
         </executions>
     </plugin>
-      <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-              <source>8</source>
-              <target>8</target>
-          </configuration>
-      </plugin>
+<!--      <plugin>-->
+<!--          <groupId>org.apache.maven.plugins</groupId>-->
+<!--          <artifactId>maven-compiler-plugin</artifactId>-->
+<!--          <configuration>-->
+<!--              <source>8</source>-->
+<!--              <target>8</target>-->
+<!--          </configuration>-->
+<!--      </plugin>-->
+
   </plugins>
 
 </build>
