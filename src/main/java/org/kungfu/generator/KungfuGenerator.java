@@ -18,11 +18,11 @@ public class KungfuGenerator {
     String GEN_MYSQL_URL = "jdbc:mysql://%s/%s?characterEncoding=utf8&useSSL=false&zeroDateTimeBehavior=convertToNull";
     private static Template template = null;
     private static Engine engine;
-    protected String baseModelTemplate = "/org/kungfu/generator/basemodel.tpl";
-    protected String modelTemplate = "/org/kungfu/generator/model.tpl";
-    protected String dtoTemplate = "/org/kungfu/generator/dto.tpl";
-    protected String serviceTemplate = "/org/kungfu/generator/service.tpl";
-    protected String controllerTemplate = "/org/kungfu/generator/controller.tpl";
+    protected String baseModelTemplate = "/generator/basemodel.tpl";
+    protected String modelTemplate = "/generator/model.tpl";
+    protected String dtoTemplate = "/generator/dto.tpl";
+    protected String serviceTemplate = "/generator/service.tpl";
+    protected String controllerTemplate = "/generator/controller.tpl";
     protected final static String LAYERED_BASE_MODEL = "base";
     protected final static String LAYERED_MODEL = "model";
     protected final static String LAYERED_DTO = "dto";
