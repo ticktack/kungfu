@@ -57,19 +57,30 @@ public class KungfuGenerator {
         }
     }
 
+    private String getTemplateByType(boolean isBlank, Map<String, String> templateMap, String templateType, String defaultTemplate) {
+        if (isBlank || templateMap.get(templateType) == null) {
+            return defaultTemplate;
+        }
+        return templateMap.get(templateType);
+    }
+
     private String codeTemplate(Map<String, String> templateMap, String templateType) {
+        boolean isBlank = false;
+        if (templateMap == null || templateMap.isEmpty()) {
+            isBlank = true;
+        }
         // 支持用户自定义模板
         switch (templateType) {
             case LAYERED_BASE_MODEL:
-                return StrKit.notBlank(templateMap.get(this.LAYERED_BASE_MODEL)) ? templateMap.get(this.LAYERED_BASE_MODEL) : this.baseModelTemplate;
+                return getTemplateByType(isBlank, templateMap, this.LAYERED_BASE_MODEL,this.baseModelTemplate);
             case LAYERED_MODEL:
-                return StrKit.notBlank(templateMap.get(this.LAYERED_MODEL)) ? templateMap.get(this.LAYERED_MODEL) : this.modelTemplate;
+                return getTemplateByType(isBlank, templateMap, this.LAYERED_MODEL, this.modelTemplate);
             case LAYERED_DTO:
-                return StrKit.notBlank(templateMap.get(this.LAYERED_DTO)) ? templateMap.get(this.LAYERED_DTO) : this.dtoTemplate;
+                return getTemplateByType(isBlank, templateMap, this.LAYERED_DTO, this.dtoTemplate);
             case LAYERED_SERVICE:
-                return StrKit.notBlank(templateMap.get(this.LAYERED_SERVICE)) ? templateMap.get(this.LAYERED_SERVICE) : this.serviceTemplate;
+                return getTemplateByType(isBlank, templateMap, this.LAYERED_SERVICE, this.serviceTemplate);
             case LAYERED_CONTROLLER:
-                return StrKit.notBlank(templateMap.get(this.LAYERED_CONTROLLER)) ? templateMap.get(this.LAYERED_CONTROLLER) : this.controllerTemplate;
+                return getTemplateByType(isBlank, templateMap, this.LAYERED_CONTROLLER, this.controllerTemplate);
         }
 
         throw new IllegalArgumentException("template name error.");
