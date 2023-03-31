@@ -1,9 +1,9 @@
 package org.kungfu.core;
 
 import com.alibaba.fastjson.JSON;
+import com.jfinal.plugin.activerecord.Record;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,5 +76,51 @@ public class KungfuKit {
             return true;
         }
         return false;
+    }
+
+    public static Map<String, Object> toHump(String json) {
+        try {
+            Map<String, Object> map = (Map<String, Object>) JSON.parse(json);
+            Map<String, Object> newmap = new HashMap<>();
+
+            Iterator it = map.keySet().iterator();
+            while (it.hasNext()) {
+                String key = (String) it.next();
+                if (key.contains("_")) {
+                    // key line to hump style
+                    newmap.put(lineToHump(key), map.get(key));
+                }
+                else {
+                    newmap.put(key, map.get(key));
+                }
+            }
+
+            return newmap;
+
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    public static List<Record> toHumpsList(List<Record> recordList) {
+        List<Record> dist = new ArrayList<>();
+        for (Record record : recordList) {
+            Record r = new Record();
+            r.setColumns(toHump(record.toJson()));
+            dist.add(r);
+        }
+
+        return dist;
+    }
+
+    public static List<Map<String, Object>> toHumps(List<Record> recordList) {
+        List<Map<String, Object>> dist = new ArrayList<>();
+        for (Record record : recordList) {
+            dist.add(toHump(record.toJson()));
+        }
+
+        return dist;
     }
 }
