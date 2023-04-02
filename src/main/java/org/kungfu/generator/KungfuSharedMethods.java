@@ -1,12 +1,20 @@
 package org.kungfu.generator;
 
+import com.jfinal.kit.StrKit;
+
 public class KungfuSharedMethods {
-    public static String toJavaType(String columnType) {
-        switch (columnType.toUpperCase()) {
+    public static String toJavaType(String dataTye, String columnType) {
+        switch (dataTye.toUpperCase()) {
             case "INT":
             case "INTEGER":
-            case "TINYINT":
                 return "Integer";
+            case "TINYINT":
+                if (columnType.equals("tinyint(1)")) {
+                    return "Boolean";
+                }
+                else {
+                    return "Integer";
+                }
             case "BIGINT":
                 return "Long";
             case "FLOAT":
@@ -38,12 +46,18 @@ public class KungfuSharedMethods {
         }
     }
 
-    public static String toJavaMethod(String columnType) {
-        switch (columnType.toUpperCase()) {
+    public static String toJavaMethod(String dataTye, String columnType) {
+        switch (dataTye.toUpperCase()) {
             case "INT":
             case "INTEGER":
-            case "TINYINT":
                 return "Int";
+            case "TINYINT":
+                if (columnType.equals("tinyint(1)")) {
+                    return "";
+                }
+                else {
+                    return "Int";
+                }
             case "BIGINT":
                 return "Long";
             case "FLOAT":
@@ -132,4 +146,29 @@ public class KungfuSharedMethods {
         }
     }
 
+    public static String getTreeCode(String tableName) {
+        // sysMenu.getMenuCode()
+        return String.format("%s.get%sCode()", StrKit.toCamelCase(tableName), StrKit.firstCharToUpperCase(StrKit.toCamelCase(tableName.substring(tableName.indexOf("_")))));
+    }
+
+    public static String getTreeName(String tableName) {
+        // getMenuName()
+        return String.format("get%sName()", StrKit.firstCharToUpperCase(StrKit.toCamelCase(tableName.substring(tableName.indexOf("_")))));
+    }
+
+    public static String getCodeColumn(String tableName) {
+        // menu_code
+        return String.format("%s_code", StrKit.toCamelCase(tableName.substring(tableName.indexOf("_"))));
+    }
+
+    public static String getCodeColumnName(String tableName) {
+        // menu_name
+        return String.format("%s_name", StrKit.toCamelCase(tableName.substring(tableName.indexOf("_"))));
+    }
+
+
+
+    public static void main(String[] args) {
+        System.out.println(getCodeColumn("sys_menu"));
+    }
 }

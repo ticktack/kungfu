@@ -10,6 +10,8 @@ import com.jfinal.kit.Ret;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
 import org.kungfu.core.*;
+import org.kungfu.validator.HeaderValidator;
+import org.kungfu.validator.PostRequestValidator;
 import com.lastb7.swagger.annotation.ApiResCustom;
 import com.lastb7.swagger.enumeration.ApiEnum;
 import io.swagger.annotations.Api;

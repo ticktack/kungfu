@@ -14,8 +14,8 @@ public abstract class Base#(className)<M extends Base#(className)<M>> extends Mo
     #for(column : columnList)
     #set(columnName=(toCamelCase(column.column_name)))
     #set(upperCaseColumnName=firstCharToUpperCase(toCamelCase(column.column_name)))
-    #set(javaType=toJavaType(column.data_type))
-    #set(javaMethod=toJavaMethod(column.data_type))
+    #set(javaType=toJavaType(column.data_type, column.column_type))
+    #set(javaMethod=toJavaMethod(column.data_type, column.column_type))
 	/**
 	 * #(column.column_comment)
 	 */

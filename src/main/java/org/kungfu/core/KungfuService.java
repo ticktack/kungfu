@@ -3,6 +3,7 @@ package org.kungfu.core;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.*;
+import org.kungfu.util.KungfuKit;
 
 import java.util.*;
 

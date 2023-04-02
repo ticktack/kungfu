@@ -1,11 +1,13 @@
-package org.kungfu.core;
+package org.kungfu.util;
 
 import com.alibaba.fastjson.JSON;
+import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.Record;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class KungfuKit {
     private static Pattern humpPattern = Pattern.compile("[A-Z]");
@@ -122,5 +124,18 @@ public class KungfuKit {
         }
 
         return dist;
+    }
+
+    public static <M extends Model<M>> List<M> toHumpModelList(List<M> list) {
+        List<M> resultList = list.stream()
+                .map(record -> {
+                    M r = record;
+                    String[] attrs = r._getAttrNames();
+                    r._setOrPut(toHump(record.toJson()));
+                    r.remove(attrs);
+                    return r;
+                }).collect(Collectors.toList());
+
+        return resultList;
     }
 }

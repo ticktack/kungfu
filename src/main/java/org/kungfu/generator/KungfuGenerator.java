@@ -1,6 +1,5 @@
 package org.kungfu.generator;
 
-import org.kungfu.util.FileKit;
 import com.jfinal.kit.Kv;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
@@ -9,6 +8,7 @@ import com.jfinal.plugin.activerecord.Record;
 import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.template.Engine;
 import com.jfinal.template.Template;
+import org.kungfu.util.FileKit;
 
 import java.io.File;
 import java.util.List;
@@ -22,17 +22,26 @@ public class KungfuGenerator {
     protected String modelTemplate = "/generator/model.tpl";
     protected String dtoTemplate = "/generator/dto.tpl";
     protected String serviceTemplate = "/generator/service.tpl";
+    protected String serviceTreeTemplate = "/generator/tree_service.tpl";
     protected String controllerTemplate = "/generator/controller.tpl";
+    protected String controllerTreeTemplate = "/generator/tree_controller.tpl";
     protected final static String LAYERED_BASE_MODEL = "base";
     protected final static String LAYERED_MODEL = "model";
     protected final static String LAYERED_DTO = "dto";
     protected final static String LAYERED_SERVICE = "service";
+    protected final static String LAYERED_TREE_SERVICE = "tree_service";
     protected final static String LAYERED_CONTROLLER = "controller";
+    protected final static String LAYERED_TREE_CONTROLLER = "tree_controller";
 
     private final static String[] LAYERED_ARRAY = new String[]{LAYERED_BASE_MODEL, LAYERED_MODEL, LAYERED_DTO, LAYERED_SERVICE, LAYERED_CONTROLLER};
 
-    private final static String BASE_MODEL_SQL = "select column_name,data_type,is_nullable,column_comment from information_schema.`columns` where table_schema='%s' and table_name='%s'";
-    private final static String DTO_SQL = BASE_MODEL_SQL + " and column_name not in('create_user','create_by','create_dept','create_time','update_user','update_by','update_time','status','is_deleted')";;
+    private final static String[] LAYERED_TREE_ARRAY = new String[]{LAYERED_BASE_MODEL, LAYERED_MODEL, LAYERED_DTO, LAYERED_TREE_SERVICE, LAYERED_TREE_CONTROLLER};
+
+    private final static String BASE_MODEL_SQL = "select column_name,data_type,column_type,is_nullable,column_comment from information_schema.`columns` where table_schema='%s' and table_name='%s'";
+    private final static String DTO_SQL = BASE_MODEL_SQL + " and column_name not in('create_user','create_user_id','create_by','create_dept','create_time','update_user','update_user_id','update_by','update_time','status','is_deleted')";
+
+    private final static String IF_TREE_TABLE_SQL = BASE_MODEL_SQL + " and column_name in ('parent_code','pid')";
+
     private final static String TABLE_SQL = "select table_name, table_comment from information_schema.`tables` where table_schema='%s'";
 
     public void init(String databaseHost, String databaseName, String username, String password) {
@@ -81,6 +90,10 @@ public class KungfuGenerator {
                 return getTemplateByType(isBlank, templateMap, this.LAYERED_SERVICE, this.serviceTemplate);
             case LAYERED_CONTROLLER:
                 return getTemplateByType(isBlank, templateMap, this.LAYERED_CONTROLLER, this.controllerTemplate);
+            case LAYERED_TREE_SERVICE:
+                return getTemplateByType(isBlank, templateMap, this.LAYERED_TREE_SERVICE, this.serviceTreeTemplate);
+            case LAYERED_TREE_CONTROLLER:
+                return getTemplateByType(isBlank, templateMap, this.LAYERED_TREE_CONTROLLER, this.controllerTreeTemplate);
         }
 
         throw new IllegalArgumentException("template name error.");
@@ -128,6 +141,19 @@ public class KungfuGenerator {
                 filePath = String.format("%s/%s/controller/%sController.java", basePath, moduleName, className);
                 template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_CONTROLLER));
                 break;
+
+            case LAYERED_TREE_SERVICE:
+                mkdir(String.format("%s/%s/service", basePath, moduleName));
+                filePath = String.format("%s/%s/service/%sService.java", basePath, moduleName, className);
+                template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_TREE_SERVICE));
+                break;
+
+            case LAYERED_TREE_CONTROLLER:
+                mkdir(String.format("%s/%s/controller", basePath, moduleName));
+                kv.set("basePath", tableName.replaceAll("_", "-"));
+                filePath = String.format("%s/%s/controller/%sController.java", basePath, moduleName, className);
+                template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_TREE_CONTROLLER));
+                break;
         }
 
         String codeContent = template.renderToString(kv);
@@ -136,6 +162,7 @@ public class KungfuGenerator {
     }
 
     private String tableConditionFormat(String tables) {
+        tables = "'" + tables + "'";
         return tables.replaceAll(" ", "").replaceAll(",", "','");
     }
 
@@ -154,8 +181,11 @@ public class KungfuGenerator {
         for (Record record : tableList) {
             String tableName = record.getStr("table_name");
             String tableComment = record.getStr("table_comment");
+
+            Record treeTable = Db.findFirst(String.format(IF_TREE_TABLE_SQL, databaseName, tableName));
+
             if (genLayers.length == 0) {
-                genLayers = LAYERED_ARRAY;
+                genLayers = treeTable == null ? LAYERED_ARRAY : LAYERED_TREE_ARRAY;
             }
             for (String layeredType : genLayers) {
                 genLayeredCode(layeredType, databaseName, basePackage, moduleName, tableName, tableComment, templateMap);

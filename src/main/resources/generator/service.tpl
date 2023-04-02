@@ -11,7 +11,7 @@ import com.jfinal.plugin.activerecord.Record;
 
 import java.util.Date;
 
-public class #(firstCharToUpperCase(toCamelCase(tableName)))Service extends KungfuService<CodeTable> {
+public class #(firstCharToUpperCase(toCamelCase(tableName)))Service extends KungfuService<#(firstCharToUpperCase(toCamelCase(tableName)))> {
     public Ret saveOrUpdate(#(firstCharToUpperCase(toCamelCase(tableName))) #(toCamelCase(tableName)), String userCode) {
 
         if (#(toCamelCase(tableName)) == null) {

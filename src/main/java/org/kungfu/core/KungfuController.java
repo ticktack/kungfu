@@ -7,6 +7,7 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import org.kungfu.util.KungfuKit;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -91,12 +92,16 @@ public class KungfuController extends Controller {
         return dist;
     }
    
-    public UserInfo getUserInfo() throws UnsupportedEncodingException {
+    public UserInfo getUserInfo() {
         String userName = getHeader("userName");
         String userIdStr = getHeader("userId");
         Long userId = 0L;
         if (StrKit.notBlank(userName)) {
-            userName = URLDecoder.decode(userName, "UTF-8");
+            try {
+                userName = URLDecoder.decode(userName, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
         if (StrKit.notBlank(userIdStr)) {
             userId = Long.parseLong(userIdStr);

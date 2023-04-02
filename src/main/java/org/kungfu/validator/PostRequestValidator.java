@@ -1,9 +1,10 @@
-package org.kungfu.core;
+package org.kungfu.validator;
 
 import com.jfinal.core.Controller;
 import com.jfinal.kit.Ret;
 import com.jfinal.kit.StrKit;
 import com.jfinal.validate.Validator;
+import org.kungfu.core.KungfuConstant;
 
 public class PostRequestValidator extends Validator {
 
