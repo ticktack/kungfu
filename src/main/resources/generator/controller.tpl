@@ -1,14 +1,21 @@
 package #(basePackage).modules.#(moduleName).controller;
 
-import #(basePackage).modules.#(moduleName).dto.#(firstCharToUpperCase(toCamelCase(tableName)))DTO;
-import #(basePackage).modules.#(moduleName).model.#(firstCharToUpperCase(toCamelCase(tableName)));
-import #(basePackage).modules.#(moduleName).service.#(firstCharToUpperCase(toCamelCase(tableName)))Service;
+#set(className=firstCharToUpperCase(toCamelCase(tableName)))
+#set(camelCaseName=toCamelCase(tableName))
+#set(tableComment=tableComment.replace("表",""))
+import #(basePackage).modules.#(moduleName).dto.#(className)DTO;
+import #(basePackage).modules.#(moduleName).model.#(className);
+import #(basePackage).modules.#(moduleName).service.#(className)Service;
+import com.jfinal.kit.StrKit;
 import com.jfinal.aop.Inject;
 import com.jfinal.aop.Before;
 import com.jfinal.core.Path;
-import com.jfinal.kit.Ret;
+import org.kungfu.core.R;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.ehcache.CacheKit;
+import com.jfinal.plugin.ehcache.CacheName;
+import com.jfinal.plugin.ehcache.EvictInterceptor;
 import org.kungfu.core.*;
 import org.kungfu.validator.HeaderValidator;
 import org.kungfu.validator.PostRequestValidator;
@@ -21,24 +28,24 @@ import io.swagger.annotations.ApiOperation;
 
 @Api(value = "#(tableComment)", tags = "#(tableComment)接口")
 @Path("/#(basePath)")
-public class #(firstCharToUpperCase(toCamelCase(tableName)))Controller extends KungfuController {
+public class #(className)Controller extends KungfuController {
 
     @Inject
-    private #(firstCharToUpperCase(toCamelCase(tableName)))Service #(toCamelCase(tableName))Service;
+    private #(className)Service #(camelCaseName)Service;
 
 
     @ApiOperation(value = "#(tableComment)信息保存或修改", notes = "根据表单内容保存或更新内容", httpMethod = ApiEnum.METHOD_POST, produces = ApiEnum.PRODUCES_JSON)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userName", value = "操作人姓名", paramType = ApiEnum.PARAM_TYPE_BODY),
-            @ApiImplicitParam(name = "#(toCamelCase(tableName))", value = "#(tableComment)信息", dataTypeClass = #(firstCharToUpperCase(toCamelCase(tableName)))DTO.class,  paramType = ApiEnum.PARAM_TYPE_BODY)
+            @ApiImplicitParam(name = "#(camelCaseName)", value = "#(tableComment)信息", dataTypeClass = #(className)DTO.class,  paramType = ApiEnum.PARAM_TYPE_BODY)
     })
     @ApiResCustom(ResultVO.class)
-    @Before(PostRequestValidator.class)
+    @Before({PostRequestValidator.class, HeaderValidator.class, EvictInterceptor.class})
+    @CacheName("#(camelCaseName)")
     public void saveOrUpdate() {
-        String userName = toStr("userName");
-        #(firstCharToUpperCase(toCamelCase(tableName))) #(toCamelCase(tableName)) = toModel("#(toCamelCase(tableName))", #(firstCharToUpperCase(toCamelCase(tableName))).class);
-
-        renderJson(#(toCamelCase(tableName))Service.saveOrUpdate(#(toCamelCase(tableName)), userName));
+        UserInfo userInfo = getUserInfo();
+        #(className) #(camelCaseName) = toModel(#(className).class);
+        CacheKit.removeAll("#(camelCaseName)");
+        renderJson(#(camelCaseName)Service.saveOrUpdate(#(camelCaseName), userInfo));
     }
 
 
@@ -54,32 +61,38 @@ public class #(firstCharToUpperCase(toCamelCase(tableName)))Controller extends K
 
         qc = convention(qc, KungfuConstant.QUERY_TYPE_PAGE);
 
-        Page<Record> page = #(toCamelCase(tableName))Service.page(qc, #(firstCharToUpperCase(toCamelCase(tableName))).class);
+        Page<Record> page = #(camelCaseName)Service.page(qc, #(className).class);
 
-        renderJson(toHumpRecordPage(page));
+        renderJson(R.ok("page", toHumpRecordPage(page)));
     }
 
     @ApiOperation(value = "#(tableComment)信息查询", notes = "根据表ID查询#(tableComment)信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "#(toCamelCase(tableName))Id", value = "#(tableComment)ID", defaultValue = "100")
+            @ApiImplicitParam(name = "#(camelCaseName)Id", value = "#(tableComment)ID", defaultValue = "100")
     })
     @ApiResCustom(ResultVO.class)
     public void getInfo() {
-        Long #(toCamelCase(tableName))Id = getLong("#(toCamelCase(tableName))Id");
-        Record record = #(toCamelCase(tableName))Service.selectById(#(toCamelCase(tableName))Id);
-        renderJson(Ret.ok("#(toCamelCase(tableName))", toHump(record)));
+        Long #(camelCaseName)Id = getLong("#(camelCaseName)Id");
+        Record record = #(camelCaseName)Service.selectById(#(camelCaseName)Id);
+        renderJson(R.ok("#(camelCaseName)", toHump(record)));
     }
 
 
-    @ApiOperation(value = "删除#(tableComment)记录", notes = "根据表ID删除#(tableComment)记录")
+    @ApiOperation(value = "删除#(tableComment)记录", notes = "根据表ID删除#(tableComment)记录，支持批量删除")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "#(toCamelCase(tableName))Id", value = "#(toCamelCase(tableComment))ID", defaultValue = "100")
+            @ApiImplicitParam(name = "#(camelCaseName)Ids", value = "#(toCamelCase(tableComment))IDs", defaultValue = "100,200,300")
     })
     @ApiResCustom(ResultVO.class)
-    public void deleteById() {
-        Long #(toCamelCase(tableName))Id = getLong("#(toCamelCase(tableName))Id");
+    public void deleteByIds() {
+        String #(camelCaseName)Ids = get("#(camelCaseName)Ids");
+        if (StrKit.isBlank(#(camelCaseName)Ids)) {
+            renderJson(R.fail("#(toCamelCase(tableComment))IDs为空"));
+            return;
+        }
 
-        renderJson(#(toCamelCase(tableName))Service.deleteById(#(toCamelCase(tableName))Id));
+        Long[] arr = toArray(#(camelCaseName)Ids, Long::new);
+
+        renderJson(#(camelCaseName)Service.deleteByIds(arr));
     }
 
 }

@@ -6,17 +6,17 @@ import java.util.Date;
 
 @ApiModel("#(tableComment)DTO")
 public class #(firstCharToUpperCase(toCamelCase(tableName)))DTO {
-    #for(x : columnList)
-    @ApiModelProperty(value = "#(notBlank(x.column_comment)?x.column_comment:'暂无注释')", example = "#(toExample(x.data_type))", position= #(for.count)#if(x.is_nullable == 'NO'), required = true#end)
-    private #(toJavaType(x.data_type,x.column_type)) #(toCamelCase(x.column_name));
+    #for(column : columnList)
+    @ApiModelProperty(value = "#(notBlank(column.column_comment)?column.column_comment:'暂无注释')", example = "#(toExample(column.data_type))", position= #(for.count)#if(column.is_nullable == 'NO'), required = true#end)
+    private #(toJavaType(column.data_type,column.column_type)) #(toCamelCase(column.column_name));
     #end
 
-    #for(x : columnList)
-    public #(toJavaType(x.data_type,x.column_type)) get#(firstCharToUpperCase(toCamelCase(x.column_name)))() {
-      return #(toCamelCase(x.column_name));
+    #for(column : columnList)
+    public #(toJavaType(column.data_type,column.column_type)) get#(firstCharToUpperCase(toCamelCase(column.column_name)))() {
+      return #(toCamelCase(column.column_name));
     }
-    public void set#(firstCharToUpperCase(toCamelCase(x.column_name)))(#(toJavaType(x.data_type,x.column_type)) #(toCamelCase(x.column_name))) {
-      this.#(toCamelCase(x.column_name)) = #(toCamelCase(x.column_name));
+    public void set#(firstCharToUpperCase(toCamelCase(column.column_name)))(#(toJavaType(column.data_type,column.column_type)) #(toCamelCase(column.column_name))) {
+      this.#(toCamelCase(column.column_name)) = #(toCamelCase(column.column_name));
     }
 
     #end

@@ -9,7 +9,7 @@ import #(basePackage).modules.#(moduleName).service.#(className)Service;
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Inject;
 import com.jfinal.core.Path;
-import com.jfinal.kit.Ret;
+import org.kungfu.core.R;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
@@ -44,7 +44,7 @@ public class #(className)Controller extends KungfuController {
         // 缓存
         List<#(className)> #(camelCaseName)Tree = CacheKit.get("#(camelCaseName)", "#(camelCaseName)Tree", () -> #(camelCaseName)Service.buildTree(searchName));
 
-        renderJson(Ret.ok("#(camelCaseName)Tree", #(camelCaseName)Tree));
+        renderJson(R.ok("#(camelCaseName)Tree", #(camelCaseName)Tree));
     }
 
     @ApiOperation(value = "#(tableComment)信息保存或修改", notes = "根据表单内容保存或更新内容", httpMethod = ApiEnum.METHOD_POST, produces = ApiEnum.PRODUCES_JSON)
@@ -52,12 +52,11 @@ public class #(className)Controller extends KungfuController {
             @ApiImplicitParam(name = "#(camelCaseName)", value = "#(tableComment)信息", dataTypeClass = #(className)DTO.class,  paramType = ApiEnum.PARAM_TYPE_BODY)
     })
     @ApiResCustom(ResultVO.class)
-    @Before({PostRequestValidator.class, HeaderValidator.class, EvictInterceptor.class})
-    @CacheName("#(camelCaseName)")
+    @Before({PostRequestValidator.class, HeaderValidator.class})
     public void saveOrUpdate() {
         UserInfo userInfo = getUserInfo();
         #(className) #(camelCaseName) = toModel(#(className).class);
-        CacheKit.removeAll("#(camelCaseName)");
+
         renderJson(#(camelCaseName)Service.saveOrUpdate(#(camelCaseName), userInfo));
     }
 
@@ -75,7 +74,7 @@ public class #(className)Controller extends KungfuController {
 
         Page<Record> page = #(camelCaseName)Service.page(qc, #(className).class);
 
-        renderJson(toHumpRecordPage(page));
+        renderJson(R.ok("page", toHumpRecordPage(page)));
     }
 
     @ApiOperation(value = "#(tableComment)信息查询", notes = "根据表ID查询#(tableComment)信息")
@@ -86,7 +85,7 @@ public class #(className)Controller extends KungfuController {
     public void getInfo() {
         Long #(camelCaseName)Id = getLong("#(camelCaseName)Id");
         Record record = #(camelCaseName)Service.selectById(#(camelCaseName)Id);
-        renderJson(Ret.ok("#(camelCaseName)", toHump(record)));
+        renderJson(R.ok("#(camelCaseName)", toHump(record)));
     }
 
 
@@ -98,7 +97,7 @@ public class #(className)Controller extends KungfuController {
     public void deleteByIds() {
         String #(camelCaseName)Ids = get("#(camelCaseName)Ids");
         if (StrKit.isBlank(#(camelCaseName)Ids)) {
-            renderJson(Ret.fail("#(toCamelCase(tableComment))IDs为空"));
+            renderJson(R.fail("#(toCamelCase(tableComment))IDs为空"));
             return;
         }
 
@@ -120,7 +119,7 @@ public class #(className)Controller extends KungfuController {
         Long #(camelCaseName)Id = getLong("#(camelCaseName)Id");
         Boolean isEnabled = getBoolean("isEnabled");
 
-        renderJson(#(camelCaseName)Service.setStatus(#(camelCaseName)Id, isEnabled, userInfo) ? Ret.ok("更新成功") : Ret.fail("更新失败"));
+        renderJson(#(camelCaseName)Service.setStatus(#(camelCaseName)Id, isEnabled, userInfo) ? R.ok("更新成功") : R.fail("更新失败"));
     }
 
 }

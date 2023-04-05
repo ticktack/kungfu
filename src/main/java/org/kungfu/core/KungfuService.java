@@ -30,15 +30,19 @@ public class KungfuService <M extends Model<M>> {
         }
         return map;
     }
-    protected Table getTable(Model<M> model) {
-        return TableMapping.me().getTable(model.getClass());
+    protected Table getTable(Class<? extends Model> clazz) {
+        return TableMapping.me().getTable(clazz);
     }
 
-    public String buildQuerySql(QueryCondition qc, Model<M> model, String buildQueryType) {
-        Table table = getTable(model);
+    public String buildQuerySql(QueryCondition qc, Model<M> model, Class<? extends Model> clazz, String buildQueryType) {
+        Table table = getTable(clazz);
         String selectSql = String.format("select * from %s where 1=1", table.getName());
         String orderBySql = KungfuConstant.QUERY_TYPE_ONE.equals(buildQueryType) ? "" :
                 String.format(" order by %s %s", qc.getOrderColumnName(), qc.getOrderBy());
+
+        if (model == null) {
+            return selectSql + orderBySql;
+        }
 
         StringBuffer whereSql = new StringBuffer();
         String[] columns = model._getAttrNames();
@@ -70,8 +74,14 @@ public class KungfuService <M extends Model<M>> {
     }
 
     private DbTemplate query(QueryCondition qc, Class<? extends Model> clazz, String buildQueryType) {
+
+        if (qc.getModelMap() == null || qc.getModelMap().isEmpty()) {
+            String pageSql = buildQuerySql(qc, null, clazz, buildQueryType);
+            return Db.templateByString(pageSql, Kv.create());
+        }
+
         Model<M> model = KungfuKit.toModel(qc.getModelMap(), clazz);
-        String pageSql = buildQuerySql(qc, model, buildQueryType);
+        String pageSql = buildQuerySql(qc, model,clazz, buildQueryType);
 
         Kv params = Kv.create();
         params.set(qc.getModelMap());
@@ -201,6 +211,7 @@ public class KungfuService <M extends Model<M>> {
         }
 
         Record root = new Record();
+        root.set("id", 0L);
         root.set(KungfuKit.lineToHump(codeName), "root");
         root.set("name", rootName);
         root.set("children", returnList);

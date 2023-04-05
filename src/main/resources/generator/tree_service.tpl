@@ -3,12 +3,13 @@ package #(basePackage).modules.#(moduleName).service;
 import #(basePackage).modules.#(moduleName).model.#(firstCharToUpperCase(toCamelCase(tableName)));
 import org.kungfu.core.*;
 import org.kungfu.util.KungfuKit;
-import com.jfinal.kit.Ret;
+import org.kungfu.core.R;
 import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.ehcache.CacheKit;
 import java.util.Date;
 import java.util.List;
 
@@ -38,16 +39,16 @@ public class #(className)Service extends KungfuService<#(className)> {
         return dao.findFirst("select * from #(tableName) where #(codeColumn)=?", code);
     }
 
-    public Ret saveOrUpdate(#(className) #(camelCaseName), UserInfo userInfo) {
+    public R saveOrUpdate(#(className) #(camelCaseName), UserInfo userInfo) {
 
         if (#(camelCaseName) == null) {
-            return Ret.fail("信息不能为空");
+            return R.fail(610, "信息不能为空");
         }
 
         if (#(camelCaseName).getId() == null) {
             #(className) exist = findByCode(#(treeCode));
             if (exist != null) {
-                return Ret.fail("编码已存在，请重新输入");
+                return R.fail(690, "编码已存在，请重新输入");
             }
         }
 
@@ -66,10 +67,11 @@ public class #(className)Service extends KungfuService<#(className)> {
             #(camelCaseName).setUpdateUserId(userInfo.getUserId());
             #(camelCaseName).setUpdateTime(date);
             if (#(camelCaseName).update()) {
-                return Ret.ok("更新成功");
+                CacheKit.remove("#(camelCaseName)", "#(camelCaseName)Tree");
+                return R.ok("更新成功");
             }
 
-            return Ret.ok("更新失败");
+            return R.fail(620, "更新失败");
         }
         else {
             #(camelCaseName).setCreateUser(userInfo.getUserName());
@@ -77,10 +79,11 @@ public class #(className)Service extends KungfuService<#(className)> {
             #(camelCaseName).setCreateTime(date);
 
             if (#(camelCaseName).save()) {
-                return Ret.ok("保存成功");
+                CacheKit.removeAll("#(camelCaseName)");
+                return R.ok("保存成功");
             }
 
-            return Ret.fail("保存失败");
+            return R.fail(630, "保存失败");
         }
 
     }
@@ -90,14 +93,14 @@ public class #(className)Service extends KungfuService<#(className)> {
         return Db.findById("#(tableName)", #(toCamelCase(tableName))Id);
     }
 
-    public Ret deleteByIds(Long[] deleteByIds) {
+    public R deleteByIds(Long[] deleteByIds) {
         for (Long #(camelCaseName)Id : deleteByIds) {
             if (!dao.deleteById(#(camelCaseName)Id)) {
-                return Ret.fail("删除失败");
+                return R.fail("删除失败");
             }
         }
 
-        return Ret.ok("删除成功");
+        return R.ok("删除成功");
     }
 
     public Page<Record> page(Integer pageNumber, Integer pageSize) {

@@ -1,43 +1,46 @@
 package #(basePackage).modules.#(moduleName).service;
+#set(className=firstCharToUpperCase(toCamelCase(tableName)))
+#set(camelCaseName=toCamelCase(tableName))
 
-import #(basePackage).modules.#(moduleName).model.#(firstCharToUpperCase(toCamelCase(tableName)));
-import org.kungfu.core.KungfuService;
-import org.kungfu.core.QueryCondition;
-import com.jfinal.kit.Ret;
+import #(basePackage).modules.#(moduleName).model.#(className);
+import org.kungfu.core.*;
+import org.kungfu.core.R;
 import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Page;
 import com.jfinal.plugin.activerecord.Record;
-
 import java.util.Date;
 
-public class #(firstCharToUpperCase(toCamelCase(tableName)))Service extends KungfuService<#(firstCharToUpperCase(toCamelCase(tableName)))> {
-    public Ret saveOrUpdate(#(firstCharToUpperCase(toCamelCase(tableName))) #(toCamelCase(tableName)), String userCode) {
+public class #(className)Service extends KungfuService<#(className)> {
+    private #(className) dao = #(className).dao;
 
-        if (#(toCamelCase(tableName)) == null) {
-            return Ret.fail("信息不能为空");
+    public R saveOrUpdate(#(className) #(camelCaseName), UserInfo userInfo) {
+
+        if (#(camelCaseName) == null) {
+            return R.fail(610, "信息不能为空");
         }
 
         Date date = new Date();
-        #(toCamelCase(tableName)).setUpdateUser(userCode);
-        #(toCamelCase(tableName)).setUpdateTime(date);
         if (#(toCamelCase(tableName)).getId() != null) {
-
-            if (#(toCamelCase(tableName)).update()) {
-                return Ret.ok("更新成功");
+            #(camelCaseName).setUpdateUser(userInfo.getUserName());
+            #(camelCaseName).setUpdateUserId(userInfo.getUserId());
+            #(camelCaseName).setUpdateTime(date);
+            if (#(camelCaseName).update()) {
+                return R.ok("更新成功");
             }
 
-            return Ret.ok("更新失败");
+            return R.fail(620, "更新失败");
         }
         else {
-            #(toCamelCase(tableName)).setCreateUser(userCode);
-            #(toCamelCase(tableName)).setCreateTime(date);
+            #(camelCaseName).setCreateUser(userInfo.getUserName());
+            #(camelCaseName).setCreateUserId(userInfo.getUserId());
+            #(camelCaseName).setCreateTime(date);
 
-            if (#(toCamelCase(tableName)).save()) {
-                return Ret.ok("保存成功");
+            if (#(camelCaseName).save()) {
+                return R.ok("保存成功");
             }
 
-            return Ret.fail("保存失败");
+            return R.fail(630, "保存失败");
         }
 
     }
@@ -46,13 +49,15 @@ public class #(firstCharToUpperCase(toCamelCase(tableName)))Service extends Kung
 
         return Db.findById("#(tableName)", #(toCamelCase(tableName))Id);
     }
-    public Ret deleteById(Long #(toCamelCase(tableName))Id) {
 
-        if(Db.deleteById("#(tableName)", #(toCamelCase(tableName))Id)) {
-            return Ret.ok("删除成功");
+    public R deleteByIds(Long[] deleteByIds) {
+        for (Long #(camelCaseName)Id : deleteByIds) {
+            if (!dao.deleteById(#(camelCaseName)Id)) {
+                return R.fail("删除失败");
+            }
         }
 
-        return Ret.fail("删除失败");
+        return R.ok("删除成功");
     }
 
     public Page<Record> page(Integer pageNumber, Integer pageSize) {

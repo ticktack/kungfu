@@ -237,7 +237,7 @@ public class KungfuController extends Controller {
         return array;
     }
 
-    public QueryCondition convention(QueryCondition qc, String queryType) {
+    public org.kungfu.core.QueryCondition convention(QueryCondition qc, String queryType) {
 
         if (KungfuConstant.QUERY_TYPE_PAGE.equals(queryType)) {
             if (KungfuKit.isNullOrEmpty(qc.getPageNumber())) {
