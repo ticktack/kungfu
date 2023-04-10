@@ -21,6 +21,7 @@ public class KungfuGenerator {
     protected String baseModelTemplate = "/generator/basemodel.tpl";
     protected String modelTemplate = "/generator/model.tpl";
     protected String dtoTemplate = "/generator/dto.tpl";
+    protected String validateTemplate = "/generator/validate.tpl";
     protected String serviceTemplate = "/generator/service.tpl";
     protected String serviceTreeTemplate = "/generator/tree_service.tpl";
     protected String controllerTemplate = "/generator/controller.tpl";
@@ -28,17 +29,18 @@ public class KungfuGenerator {
     protected final static String LAYERED_BASE_MODEL = "base";
     protected final static String LAYERED_MODEL = "model";
     protected final static String LAYERED_DTO = "dto";
+    protected final static String LAYERED_VALIDATE = "validate";
     protected final static String LAYERED_SERVICE = "service";
     protected final static String LAYERED_TREE_SERVICE = "tree_service";
     protected final static String LAYERED_CONTROLLER = "controller";
     protected final static String LAYERED_TREE_CONTROLLER = "tree_controller";
 
-    private final static String[] LAYERED_ARRAY = new String[]{LAYERED_BASE_MODEL, LAYERED_MODEL, LAYERED_DTO, LAYERED_SERVICE, LAYERED_CONTROLLER};
+    private final static String[] LAYERED_ARRAY = new String[]{LAYERED_BASE_MODEL, LAYERED_MODEL, LAYERED_DTO, LAYERED_VALIDATE, LAYERED_SERVICE, LAYERED_CONTROLLER};
 
-    private final static String[] LAYERED_TREE_ARRAY = new String[]{LAYERED_BASE_MODEL, LAYERED_MODEL, LAYERED_DTO, LAYERED_TREE_SERVICE, LAYERED_TREE_CONTROLLER};
+    private final static String[] LAYERED_TREE_ARRAY = new String[]{LAYERED_BASE_MODEL, LAYERED_MODEL, LAYERED_DTO, LAYERED_VALIDATE, LAYERED_TREE_SERVICE, LAYERED_TREE_CONTROLLER};
 
-    private final static String BASE_MODEL_SQL = "select column_name,data_type,column_type,is_nullable,column_comment from information_schema.`columns` where table_schema='%s' and table_name='%s'";
-    private final static String DTO_SQL = BASE_MODEL_SQL + " and column_name not in('create_user','create_user_id','create_by','create_dept','create_time','update_user','update_user_id','update_by','update_time','status','is_deleted')";
+    private final static String BASE_MODEL_SQL = "select column_name,data_type,column_type,is_nullable,column_default,column_comment from information_schema.`columns` where table_schema='%s' and table_name='%s'";
+    private final static String DTO_SQL = BASE_MODEL_SQL + " and column_name not in('pinyin','create_user','create_user_id','create_by','create_dept','create_time','update_user','update_user_id','update_by','update_time','status','is_deleted')";
 
     private final static String IF_TREE_TABLE_SQL = BASE_MODEL_SQL + " and column_name in ('parent_code','pid')";
 
@@ -86,6 +88,8 @@ public class KungfuGenerator {
                 return getTemplateByType(isBlank, templateMap, this.LAYERED_MODEL, this.modelTemplate);
             case LAYERED_DTO:
                 return getTemplateByType(isBlank, templateMap, this.LAYERED_DTO, this.dtoTemplate);
+            case LAYERED_VALIDATE:
+                return getTemplateByType(isBlank, templateMap, this.LAYERED_VALIDATE, this.validateTemplate);
             case LAYERED_SERVICE:
                 return getTemplateByType(isBlank, templateMap, this.LAYERED_SERVICE, this.serviceTemplate);
             case LAYERED_CONTROLLER:
@@ -129,6 +133,14 @@ public class KungfuGenerator {
                 template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_DTO));
                 break;
 
+            case LAYERED_VALIDATE:
+                mkdir(String.format("%s/%s/validate", basePath, moduleName));
+                List<Record> columnList = Db.find(String.format(DTO_SQL, databaseName, tableName));
+                kv.set("columnList", columnList);
+                filePath = String.format("%s/%s/validate/%sValidator.java", basePath, moduleName, className);
+                template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_VALIDATE));
+                break;
+
             case LAYERED_SERVICE:
                 mkdir(String.format("%s/%s/service", basePath, moduleName));
                 filePath = String.format("%s/%s/service/%sService.java", basePath, moduleName, className);
@@ -170,11 +182,21 @@ public class KungfuGenerator {
         String queryTableSql = String.format(TABLE_SQL, databaseName);
         // 包含的表
         if (StrKit.notBlank(includeTables)) {
-            queryTableSql += String.format(" and table_name in(%s)", tableConditionFormat(includeTables));
+            if (includeTables.contains("%")) {
+                queryTableSql += String.format(" and table_name like %s", tableConditionFormat(includeTables));
+            }
+            else {
+                queryTableSql += String.format(" and table_name in(%s)", tableConditionFormat(includeTables));
+            }
         }
         // 排除的表
         if (StrKit.notBlank(excludeTables)) {
-            queryTableSql += String.format(" and table_name not in(%s)", tableConditionFormat(excludeTables));
+            if (excludeTables.contains("%")) {
+                queryTableSql += String.format(" and table_name not like %s", tableConditionFormat(excludeTables));
+            }
+            else {
+                queryTableSql += String.format(" and table_name not in(%s)", tableConditionFormat(excludeTables));
+            }
         }
 
         List<Record> tableList = Db.find(queryTableSql);

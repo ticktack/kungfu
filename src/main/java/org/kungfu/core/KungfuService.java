@@ -112,27 +112,27 @@ public class KungfuService <M extends Model<M>> {
 
 
     private List<Record> getChildListById(List<Record> list, Record t) {
-        List<Record> tlist = new ArrayList<>();
+        List<Record> childList = new ArrayList<>();
         Iterator<Record> it = list.iterator();
         while (it.hasNext()) {
             Record next = it.next();
             if (StrKit.notNull(next.getLong("pid")) && next.getLong("pid").longValue() == t.getLong("id").longValue()) {
-                tlist.add(next);
+                childList.add(next);
             }
         }
-        return tlist;
+        return childList;
     }
 
     private List<Record> getChildListByCode(List<Record> list, Record t, String codeName) {
-        List<Record> tlist = new ArrayList<>();
+        List<Record> childList = new ArrayList<>();
         Iterator<Record> it = list.iterator();
         while (it.hasNext()) {
             Record next = it.next();
-            if (StrKit.notNull(next.getStr("parent_code")) && next.getStr("parent_code").equals(t.getStr(codeName))) {
-                tlist.add(next);
+            if (StrKit.notNull(next.getStr("parentCode")) && next.getStr("parentCode").equals(t.getStr(codeName))) {
+                childList.add(next);
             }
         }
-        return tlist;
+        return childList;
     }
 
     private boolean hasChild(List<Record> list, Record t, String useIdOrCode) {
@@ -145,9 +145,9 @@ public class KungfuService <M extends Model<M>> {
 
         t.set("children", childList);
 
-        for (Record tChild : childList) {
+        for (Record treeChild : childList) {
 
-            if (hasChild(list, tChild, useIdOrCode)) {
+            if (hasChild(list, treeChild, useIdOrCode)) {
                 // 判断是否有子节点
                 Iterator<Record> it = childList.iterator();
                 while (it.hasNext()) {
@@ -183,6 +183,7 @@ public class KungfuService <M extends Model<M>> {
 
         Record root = new Record();
         root.set("id", 0L);
+        root.set("pid", 0L);
         root.set("name", rootName);
         root.set("children", returnList);
 
@@ -200,7 +201,7 @@ public class KungfuService <M extends Model<M>> {
         for (Iterator<Record> iterator = treeSourceList.iterator(); iterator.hasNext();) {
             Record record = iterator.next();
             // 如果是顶级节点, 遍历该父节点的所有子节点
-            if (!tempList.contains(record.getStr("parent_code"))) {
+            if (!tempList.contains(record.getStr("parentCode"))) {
                 recursion(treeSourceList, record, codeName);
                 returnList.add(record);
             }
@@ -212,7 +213,9 @@ public class KungfuService <M extends Model<M>> {
 
         Record root = new Record();
         root.set("id", 0L);
-        root.set(KungfuKit.lineToHump(codeName), "root");
+        root.set("parentCode", null);
+        root.set("parentName", null);
+        root.set(codeName, "root");
         root.set("name", rootName);
         root.set("children", returnList);
 

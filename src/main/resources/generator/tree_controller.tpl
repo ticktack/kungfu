@@ -5,6 +5,7 @@ package #(basePackage).modules.#(moduleName).controller;
 #set(tableComment=tableComment.replace("表",""))
 import #(basePackage).modules.#(moduleName).dto.#(className)DTO;
 import #(basePackage).modules.#(moduleName).model.#(className);
+import #(basePackage).modules.#(moduleName).validate.#(className)Validator;
 import #(basePackage).modules.#(moduleName).service.#(className)Service;
 import com.jfinal.aop.Before;
 import com.jfinal.aop.Inject;
@@ -36,7 +37,7 @@ public class #(className)Controller extends KungfuController {
 
     @ApiOperation(value = "#(tableComment)树查询", notes = "#(tableComment)树查询，查询整棵树")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchName", value = "#(tableComment)名称", defaultValue = "")
+        @ApiImplicitParam(name = "searchName", value = "#(tableComment)名称", defaultValue = "")
     })
     public void tree() {
         String searchName = get("searchName");
@@ -49,77 +50,58 @@ public class #(className)Controller extends KungfuController {
 
     @ApiOperation(value = "#(tableComment)信息保存或修改", notes = "根据表单内容保存或更新内容", httpMethod = ApiEnum.METHOD_POST, produces = ApiEnum.PRODUCES_JSON)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "#(camelCaseName)", value = "#(tableComment)信息", dataTypeClass = #(className)DTO.class,  paramType = ApiEnum.PARAM_TYPE_BODY)
+        @ApiImplicitParam(name = "#(camelCaseName)", value = "#(tableComment)信息", dataTypeClass = #(className)DTO.class,  paramType = ApiEnum.PARAM_TYPE_BODY)
     })
     @ApiResCustom(ResultVO.class)
-    @Before({PostRequestValidator.class, HeaderValidator.class})
+    @Before(#(className)Validator.class)
     public void saveOrUpdate() {
-        UserInfo userInfo = getUserInfo();
         #(className) #(camelCaseName) = toModel(#(className).class);
 
-        renderJson(#(camelCaseName)Service.saveOrUpdate(#(camelCaseName), userInfo));
+        renderJson(#(camelCaseName)Service.saveOrUpdate(#(camelCaseName), getUserInfo()));
     }
 
     @ApiOperation(value = "#(tableComment)分页查询", notes = "根据页码及查询条件分页查询")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "queryCondition", value = "查询条件", dataTypeClass = QueryCondition.class, paramType = ApiEnum.PARAM_TYPE_BODY, required = true)
+        @ApiImplicitParam(name = "queryCondition", value = "查询条件", dataTypeClass = QueryCondition.class, paramType = ApiEnum.PARAM_TYPE_BODY, required = true)
     })
     @ApiResCustom(ResultVO.class)
-    @Before(PostRequestValidator.class)
     public void queryPage() {
-
-        QueryCondition qc = toDTO(QueryCondition.class);
-
-        qc = convention(qc, KungfuConstant.QUERY_TYPE_PAGE);
-
-        Page<Record> page = #(camelCaseName)Service.page(qc, #(className).class);
-
-        renderJson(R.ok("page", toHumpRecordPage(page)));
+        renderJson(queryPage(#(className).class));
     }
 
     @ApiOperation(value = "#(tableComment)信息查询", notes = "根据表ID查询#(tableComment)信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "#(camelCaseName)Id", value = "#(tableComment)ID", defaultValue = "100")
+        @ApiImplicitParam(name = "#(camelCaseName)Id", value = "#(tableComment)ID", defaultValue = "100")
     })
     @ApiResCustom(ResultVO.class)
     public void getInfo() {
         Long #(camelCaseName)Id = getLong("#(camelCaseName)Id");
-        Record record = #(camelCaseName)Service.selectById(#(camelCaseName)Id);
-        renderJson(R.ok("#(camelCaseName)", toHump(record)));
+        renderJson(selectById(#(camelCaseName)Id, #(className).class));
     }
-
 
     @ApiOperation(value = "删除#(tableComment)记录", notes = "根据表ID删除#(tableComment)记录，支持批量删除")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "#(camelCaseName)Ids", value = "#(toCamelCase(tableComment))IDs", defaultValue = "100,200,300")
+        @ApiImplicitParam(name = "#(camelCaseName)Ids", value = "#(toCamelCase(tableComment))IDs", defaultValue = "100,200,300")
     })
     @ApiResCustom(ResultVO.class)
     public void deleteByIds() {
         String #(camelCaseName)Ids = get("#(camelCaseName)Ids");
-        if (StrKit.isBlank(#(camelCaseName)Ids)) {
-            renderJson(R.fail("#(toCamelCase(tableComment))IDs为空"));
-            return;
-        }
-
-        Long[] arr = toArray(#(camelCaseName)Ids, Long::new);
-
-        renderJson(#(camelCaseName)Service.deleteByIds(arr));
+        renderJson(deleteByIds(#(camelCaseName)Ids, #(className).class));
     }
 
     @ApiOperation(value = "设置状态", notes = "设置状态：启用停用")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "#(camelCaseName)Id", value = "#(tableComment)ID", dataType = "Long"),
-            @ApiImplicitParam(name = "isEnabled", value = "启用状态", dataType = "Boolean")
+        @ApiImplicitParam(name = "#(camelCaseName)Id", value = "#(tableComment)ID", dataType = "Long"),
+        @ApiImplicitParam(name = "isEnabled", value = "启用状态", dataType = "Boolean")
     })
     @ApiResCustom(ResultVO.class)
     @Before({EvictInterceptor.class,HeaderValidator.class})
     @CacheName("#(camelCaseName)")
     public void setStatus() {
-        UserInfo userInfo = getUserInfo();
         Long #(camelCaseName)Id = getLong("#(camelCaseName)Id");
         Boolean isEnabled = getBoolean("isEnabled");
 
-        renderJson(#(camelCaseName)Service.setStatus(#(camelCaseName)Id, isEnabled, userInfo) ? R.ok("更新成功") : R.fail("更新失败"));
+        renderJson(#(camelCaseName)Service.setStatus(#(camelCaseName)Id, isEnabled, getUserInfo()) ? R.ok("更新成功") : R.fail("更新失败"));
     }
 
 }

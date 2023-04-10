@@ -29,7 +29,6 @@ public class AuthInterceptor implements Interceptor {
 			else {
 				controller.getResponse().setStatus(403);
 				controller.renderError(403);
-				return;
 			}
 		}
 

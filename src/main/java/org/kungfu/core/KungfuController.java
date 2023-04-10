@@ -2,11 +2,10 @@ package org.kungfu.core;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.jfinal.aop.Inject;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.StrKit;
-import com.jfinal.plugin.activerecord.Model;
-import com.jfinal.plugin.activerecord.Page;
-import com.jfinal.plugin.activerecord.Record;
+import com.jfinal.plugin.activerecord.*;
 import org.kungfu.util.KungfuKit;
 
 import java.io.UnsupportedEncodingException;
@@ -18,6 +17,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class KungfuController extends Controller {
+
+    @Inject
+    private KungfuService service;
 
     private Map<String, Object> toHump(String json) {
         Map<String, Object> map = JSON.parseObject(json, Map.class);
@@ -44,6 +46,12 @@ public class KungfuController extends Controller {
 
     public Map<String, Object> toHump(Record record) {
         return toHump(record.toJson());
+    }
+
+    public Record toHumpRecord(Record record) {
+        Record r = new Record();
+        r.setColumns(toHump(record));
+        return r;
     }
    
     public Page<Record> toHumpRecordPage(Page<Record> page) {
@@ -237,7 +245,7 @@ public class KungfuController extends Controller {
         return array;
     }
 
-    public org.kungfu.core.QueryCondition convention(QueryCondition qc, String queryType) {
+    public QueryCondition convention(QueryCondition qc, String queryType) {
 
         if (KungfuConstant.QUERY_TYPE_PAGE.equals(queryType)) {
             if (KungfuKit.isNullOrEmpty(qc.getPageNumber())) {
@@ -260,4 +268,62 @@ public class KungfuController extends Controller {
 
         return qc;
     }
+
+
+    public Page<Record> queryPage(Class<? extends Model> clazz) {
+
+        QueryCondition qc = toDTO(QueryCondition.class);
+
+        qc = convention(qc, KungfuConstant.QUERY_TYPE_PAGE);
+
+        Page<Record> page = service.queryPage(qc, clazz);
+
+        return page == null ? null : toHumpRecordPage(page);
+    }
+
+
+    protected Table getTable(Class<? extends Model> clazz) {
+        return TableMapping.me().getTable(clazz);
+    }
+
+    public R selectById(Long recordId, Class<? extends Model> clazz) {
+
+        if (recordId == null) {
+           return R.fail("查询记录ID为空");
+        }
+        Table table = getTable(clazz);
+
+        Record record = Db.findById(table.getName(), recordId);
+
+        return R.ok("data", record == null ? null : toHumpRecord(record));
+    }
+
+    public R deleteById(Long recordId, Class<? extends Model> clazz) {
+
+        if (recordId == null) {
+            return R.fail(661, "删除记录ID为空");
+        }
+
+        Table table = getTable(clazz);
+
+        boolean result = Db.deleteById(table.getName(), recordId);
+
+        return result ? R.ok("删除成功") : R.fail("删除失败");
+    }
+
+    public R deleteByIds(String ids , Class<? extends Model> clazz) {
+        if (StrKit.isBlank(ids)) {
+            return R.fail(661, "删除记录ids为空");
+        }
+        Long[] idsArray = toArray(ids, Long::new);
+        Table table = getTable(clazz);
+        for (Long id : idsArray) {
+            if (!Db.deleteById(table.getName(), id)) {
+                return R.fail("删除失败");
+            }
+        }
+
+        return R.ok("删除成功");
+    }
+
 }

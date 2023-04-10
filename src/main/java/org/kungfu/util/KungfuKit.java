@@ -1,6 +1,7 @@
 package org.kungfu.util;
 
 import com.alibaba.fastjson.JSON;
+import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.Record;
 
@@ -137,5 +138,9 @@ public class KungfuKit {
                 }).collect(Collectors.toList());
 
         return resultList;
+    }
+
+    public static <T> T toModel(String json, Class<T> clazz) {
+        return StrKit.isBlank(json) ? null : JSON.parseObject(json, clazz);
     }
 }

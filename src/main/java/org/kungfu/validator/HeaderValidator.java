@@ -11,12 +11,14 @@ public class HeaderValidator extends Validator {
     @Override
     protected void validate(Controller c) {
         setShortCircuit(true);
-        setRet(Ret.fail());
-
-        String userName = c.getHeader("userName");
-        String userIdStr = c.getHeader("userId");
-        if (StrKit.isBlank(userName) || StrKit.isBlank(userIdStr)) {
-            addError(KungfuConstant.MASSAGE, "Header 请求中需要设置userId和userName");
+        setRet(Ret.fail().set("code", 700));
+        String method = c.getRequest().getMethod();
+        if (method.equals(KungfuConstant.HTTP_METHOD_POST)) {
+            String userName = c.getHeader("userName");
+            String userIdStr = c.getHeader("userId");
+            if (StrKit.isBlank(userName) || StrKit.isBlank(userIdStr)) {
+                addError(KungfuConstant.MASSAGE, "POST请求中,Header需要设置userId和userName");
+            }
         }
 
     }

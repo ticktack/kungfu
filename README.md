@@ -15,7 +15,7 @@ A library for building RESTful web services specifically designed for use with J
 <dependency>
   <groupId>io.github.ticktack</groupId>
   <artifactId>kungfu</artifactId>
-  <version>1.1.7</version>
+  <version>1.1.8</version>
 </dependency>
 
 ```
