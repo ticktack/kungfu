@@ -1,9 +1,5 @@
-<div style="text-align:center">
-<img src="https://youyayisheng.oss-cn-beijing.aliyuncs.com/kungfu/@/logo.png"  alt=""/>
-</div>
+![image](https://youyayisheng.oss-cn-beijing.aliyuncs.com/kungfu/@/logo.png)
 
-
-# kungfu #
 A library for building RESTful web services specifically designed for use with JFinal.
 ## Features
 1. Can build jfinal restful api project very fast.
