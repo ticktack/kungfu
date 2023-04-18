@@ -5,6 +5,7 @@ import com.jfinal.kit.StrKit;
 import com.jfinal.plugin.activerecord.Model;
 import com.jfinal.plugin.activerecord.Record;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,21 +60,21 @@ public class KungfuKit {
             return true;
         } else if (obj instanceof String && (obj.equals(""))) {
             return true;
-        } else if (obj instanceof Short && ((Short) obj).shortValue() == 0) {
+        } else if (obj instanceof Short && (Short) obj == 0) {
             return true;
-        } else if (obj instanceof Integer && ((Integer) obj).intValue() == 0) {
+        } else if (obj instanceof Integer && (Integer) obj == 0) {
             return true;
-        } else if (obj instanceof Double && ((Double) obj).doubleValue() == 0) {
+        } else if (obj instanceof Double && ((Double) obj) == 0) {
             return true;
-        } else if (obj instanceof Float && ((Float) obj).floatValue() == 0) {
+        } else if (obj instanceof Float && ((Float) obj) == 0) {
             return true;
-        } else if (obj instanceof Long && ((Long) obj).longValue() == 0) {
+        } else if (obj instanceof Long && ((Long) obj) == 0) {
             return true;
         } else if (obj instanceof Boolean && !((Boolean) obj)) {
             return true;
-        } else if (obj instanceof Collection && ((Collection) obj).isEmpty()) {
+        } else if (obj instanceof Collection && ((Collection<?>) obj).isEmpty()) {
             return true;
-        } else if (obj instanceof Map && ((Map) obj).isEmpty()) {
+        } else if (obj instanceof Map && ((Map<?, ?>) obj).isEmpty()) {
             return true;
         } else if (obj instanceof Object[] && ((Object[]) obj).length == 0) {
             return true;
@@ -142,5 +143,80 @@ public class KungfuKit {
 
     public static <T> T toModel(String json, Class<T> clazz) {
         return StrKit.isBlank(json) ? null : JSON.parseObject(json, clazz);
+    }
+
+    public static Map<String, Object> json2Map(String json) {
+        try {
+            Map<String, Object> map = (Map<String, Object>) JSON.parse(json);
+            Map<String, Object> result = new HashMap<>();
+
+            Iterator it = map.keySet().iterator();
+            while (it.hasNext()) {
+                String key = (String) it.next();
+                if (KungfuKit.hasUpperCase(key)) {
+                    // key hump to line style
+                    result.put(KungfuKit.humpToLine(key), map.get(key));
+                }
+                else {
+                    result.put(key, map.get(key));
+                }
+            }
+
+            return result;
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static <T extends Model> T toModelValidator(String json, Class<T> clazz) throws Exception {
+        if (StrKit.isBlank(json)) {
+            return null;
+        }
+        T entity = clazz.newInstance();
+        entity._setAttrs(json2Map(json));
+        return entity;
+    }
+
+    public static List<Class<?>> getClasses(String packageName) {
+        List<Class<?>> classes = new ArrayList<Class<?>>();
+        String path = packageName.replace('.', '/');
+        java.net.URL resource = ClassLoader.getSystemClassLoader().getResource(path);
+        if (resource == null) {
+            throw new RuntimeException("Package " + packageName + " not found on classpath.");
+        }
+        java.io.File directory = new java.io.File(resource.getFile());
+        if (directory.exists()) {
+            String[] files = directory.list();
+            for (String file : files) {
+                if (file.endsWith(".class")) {
+                    try {
+                        Class<?> cls = Class.forName(packageName + '.' + file.substring(0, file.length() - 6));
+                        classes.add(cls);
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+            throw new RuntimeException("Package " + packageName + " not found on filesystem.");
+        }
+        return classes;
+    }
+    public static Map<String, List<String>> apiMethods(String packageName) {
+        Map<String, List<String>> methodsMap = new HashMap<>();
+        List<String> methodsList;
+        List<Class<?>> classes = getClasses(packageName);
+        for (Class<?> clazz : classes) {
+            Method[] methods = clazz.getDeclaredMethods();
+            methodsList = new ArrayList<>();
+            for (Method method : methods) {
+                if (method.getModifiers() == java.lang.reflect.Modifier.PUBLIC) {
+                    methodsList.add(method.getName());
+                }
+            }
+            methodsMap.put(StrKit.firstCharToLowerCase(clazz.getSimpleName().replace("Controller", "")), methodsList);
+        }
+        return methodsMap;
     }
 }

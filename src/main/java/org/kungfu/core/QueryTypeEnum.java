@@ -1,5 +1,7 @@
 package org.kungfu.core;
 
+import com.jfinal.kit.StrKit;
+
 public enum QueryTypeEnum {
     EQUAL("eq"),                // 相等
     NOT_EQUAL("neq"),           // 不相等
@@ -16,10 +18,13 @@ public enum QueryTypeEnum {
     IN("in"),                   // 在范围内
     NOT_IN("not_in");           // 不在范围内
 
-    private String code;
+    private final String code;
 
 
     public static QueryTypeEnum getByCode(String code) {
+        if (StrKit.isBlank(code)) {
+            return null;
+        }
         for (QueryTypeEnum e: QueryTypeEnum.values()) {
             if (code.equals(e.getCode())) {
                 return e;

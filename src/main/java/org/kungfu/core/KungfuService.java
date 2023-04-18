@@ -38,34 +38,57 @@ public class KungfuService <M extends Model<M>> {
         Table table = getTable(clazz);
         String selectSql = String.format("select * from %s where 1=1", table.getName());
         String orderBySql = KungfuConstant.QUERY_TYPE_ONE.equals(buildQueryType) ? "" :
-                String.format(" order by %s %s", qc.getOrderColumnName(), qc.getOrderBy());
+                String.format(" order by %s %s", KungfuKit.humpToLine(qc.getOrderColumnName()), StrKit.isBlank(qc.getOrderBy()) ? "asc" : qc.getOrderBy());
 
         if (model == null) {
             return selectSql + orderBySql;
         }
 
-        StringBuffer whereSql = new StringBuffer();
+        StringBuilder whereSql = new StringBuilder();
         String[] columns = model._getAttrNames();
         for (String column : columns) {
             String key = KungfuKit.lineToHump(column);
-            Object object = qc.getModelMap().get(key);
-            if (!KungfuKit.isNullOrEmpty(object)) {
-                QueryTypeEnum queryTypeMenu = QueryTypeEnum.getByCode(qc.getQueryTypeMap().get(key));
-                switch (queryTypeMenu) {
-                    case EQUAL:
-                        whereSql.append(String.format(" and %s = #para(%s)", column, key));
-                        break;
-                    case LIKE:
-                        whereSql.append(String.format(" and %s like concat('%%', #para(%s), '%%')", column, key));
-                        break;
-                    case LIKE_LEFT:
-                        whereSql.append(String.format(" and %s like concat('%%', #para(%s))", column, key));
-                        break;
-                    case LIKE_RIGHT:
-                        whereSql.append(String.format(" and %s like concat(#para(%s), '%%')", column, key));
-                        break;
-                    // TODO 其他条件的查询语句生成渲染实现
+            QueryTypeEnum queryTypeMenu = QueryTypeEnum.EQUAL;
+            if (qc.getQueryTypeMap() != null) {
+                queryTypeMenu = QueryTypeEnum.getByCode(qc.getQueryTypeMap().get(key));
+                if (queryTypeMenu == null) {
+                    queryTypeMenu = QueryTypeEnum.EQUAL;
                 }
+            }
+
+            switch (queryTypeMenu) {
+                case EQUAL:
+                    if (table.getColumnNameSet().contains("parent_code") && column.contains("_code")) {
+                        //whereSql.append(String.format(" and (%s = #para(%s) or parent_code = #para(%s))", column, key, key));
+                        whereSql.append(String.format(" and parent_code = #para(%s)", key));
+                    }
+                    else {
+                        whereSql.append(String.format(" and %s = #para(%s)", column, key));
+                    }
+                    break;
+                case LIKE:
+                    whereSql.append(String.format(" and %s like concat('%%', #para(%s), '%%')", column, key));
+                    break;
+                case LIKE_LEFT:
+                    whereSql.append(String.format(" and %s like concat('%%', #para(%s))", column, key));
+                    break;
+                case LIKE_RIGHT:
+                    whereSql.append(String.format(" and %s like concat(#para(%s), '%%')", column, key));
+                    break;
+                case NOT_EQUAL:
+                    whereSql.append(String.format(" and %s <> #para(%s)", column, key));
+                    break;
+                case GREATER_EQUAL:
+                    whereSql.append(String.format(" and %s >= #para(%s)", column, key));
+                    break;
+                case GREATER_THAN:
+                    whereSql.append(String.format(" and %s > #para(%s)", column, key));
+                case LESS_EQUAL:
+                    whereSql.append(String.format(" and %s <= #para(%s)", column, key));
+                    break;
+                case LESS_THAN:
+                    whereSql.append(String.format(" and %s < #para(%s)", column, key));
+                // TODO 其他条件的查询语句生成渲染实现
             }
 
         }
@@ -159,11 +182,11 @@ public class KungfuService <M extends Model<M>> {
     }
 
     // 构建树结构方法
-    public Record buildTree(List<Record> treeSourceList, String useIdOrCode, String rootName) {
-        return useIdOrCode.equals("id") ? buildTreeById(treeSourceList, rootName) : buildTreeByCode(treeSourceList, useIdOrCode, rootName);
+    public Record buildTree(List<Record> treeSourceList, String useIdOrCode, String nameColumn, String rootName) {
+        return useIdOrCode.equals("id") ? buildTreeById(treeSourceList, nameColumn, rootName) : buildTreeByCode(treeSourceList, useIdOrCode, nameColumn, rootName);
     }
 
-    public Record buildTreeById(List<Record> treeSourceList, String rootName) {
+    public Record buildTreeById(List<Record> treeSourceList, String nameColumn, String rootName) {
         List<Record> returnList = new ArrayList<>();
         List<Long> tempList = new ArrayList<>();
         for (Record record : treeSourceList) {
@@ -184,13 +207,13 @@ public class KungfuService <M extends Model<M>> {
         Record root = new Record();
         root.set("id", 0L);
         root.set("pid", 0L);
-        root.set("name", rootName);
+        root.set(nameColumn, rootName);
         root.set("children", returnList);
 
         return root;
     }
 
-    public Record buildTreeByCode(List<Record> treeSourceList, String codeName, String rootName) {
+    public Record buildTreeByCode(List<Record> treeSourceList, String codeName, String nameColumn, String rootName) {
         List<Record> returnList = new ArrayList<>();
         List<String> tempList = new ArrayList<>();
 
@@ -216,7 +239,7 @@ public class KungfuService <M extends Model<M>> {
         root.set("parentCode", null);
         root.set("parentName", null);
         root.set(codeName, "root");
-        root.set("name", rootName);
+        root.set(nameColumn, rootName);
         root.set("children", returnList);
 
         return root;

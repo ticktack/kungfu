@@ -17,7 +17,7 @@ import java.util.Map;
          "tableName": "children_main",
          "tableComment": "左树"
      },
-     "queryCondition": {
+     "queryTypeMap": {
          "moduleId": "eq",
          "projectId": "eq",
          "tableName": "like",

@@ -18,4 +18,6 @@ public interface KungfuConstant {
     Integer DEFAULT_PAGE_SIZE = 20;
     String DEFAULT_ORDER_COLUMN = "create_time";
     String DEFAULT_ORDER_BY = "desc";
+
+    String START_TIME = "start_time";
 }

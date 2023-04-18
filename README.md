@@ -1,3 +1,8 @@
+<div style="text-align:center">
+<img src="https://youyayisheng.oss-cn-beijing.aliyuncs.com/kungfu/@/logo.png"  alt=""/>
+</div>
+
+
 # kungfu #
 A library for building RESTful web services specifically designed for use with JFinal.
 ## Features
@@ -15,7 +20,7 @@ A library for building RESTful web services specifically designed for use with J
 <dependency>
   <groupId>io.github.ticktack</groupId>
   <artifactId>kungfu</artifactId>
-  <version>1.1.8</version>
+  <version>1.1.9</version>
 </dependency>
 
 ```

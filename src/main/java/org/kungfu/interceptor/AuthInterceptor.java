@@ -4,6 +4,7 @@ import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PropKit;
+import org.kungfu.core.R;
 import org.kungfu.util.TokenKit;
 
 public class AuthInterceptor implements Interceptor {
@@ -28,7 +29,7 @@ public class AuthInterceptor implements Interceptor {
 			}
 			else {
 				controller.getResponse().setStatus(403);
-				controller.renderError(403);
+				controller.renderJson(R.fail(403, "权限校验失败: 403 Forbidden"));
 			}
 		}
 

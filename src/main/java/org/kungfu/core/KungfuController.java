@@ -183,10 +183,10 @@ public class KungfuController extends Controller {
     }
 
     public Map<String, Object> toMap() {
-        return StrKit.isBlank(getRequestBody()) ? null : json2Map(getRequestBody());
+        return StrKit.isBlank(getRequestBody()) ? null : KungfuKit.json2Map(getRequestBody());
     }
     public Map<String, Object> toMapByKey(String key) {
-        return StrKit.isBlank(getRequestBody()) ? null : json2Map(JSON.parseObject(getRequestBody()).getString(key));
+        return StrKit.isBlank(getRequestBody()) ? null : KungfuKit.json2Map(JSON.parseObject(getRequestBody()).getString(key));
     }
 
 
@@ -198,42 +198,23 @@ public class KungfuController extends Controller {
         return StrKit.isBlank(getRequestBody()) ? null : JSON.parseObject(getRequestBody(),clazz);
     }
 
-    private Map<String, Object> json2Map(String json) {
-        try {
-            Map<String, Object> map = (Map<String, Object>) JSON.parse(json);
-            Map<String, Object> result = new HashMap<>();
-
-            Iterator it = map.keySet().iterator();
-            while (it.hasNext()) {
-                String key = (String) it.next();
-                if (KungfuKit.hasUpperCase(key)) {
-                    // key hump to line style
-                    result.put(KungfuKit.humpToLine(key), map.get(key));
-                }
-                else {
-                    result.put(key, map.get(key));
-                }
-            }
-
-            return result;
-        }catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public <T extends Model> T toModel(Class<T> clazz) {
         try {
             T entity = clazz.newInstance();
-            entity._setAttrs(json2Map(getRequestBody()));
+            entity._setAttrs(KungfuKit.json2Map(getRequestBody()));
             return entity;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
 
     public <T> List<T> toModelList(String key, Class<T> clazz) {
         return StrKit.isBlank(getRequestBody()) ? null : JSONArray.parseArray(JSON.parseObject(getRequestBody()).getString(key), clazz);
+    }
+
+    public <T> List<T> toModelList(Class<T> clazz) {
+        return StrKit.isBlank(getRequestBody()) ? null : JSONArray.parseArray(getRequestBody(), clazz);
     }
 
     public static  <T extends Number> T[] toArray(String splitString, Function<String, T> mapper) {
@@ -245,7 +226,10 @@ public class KungfuController extends Controller {
         return array;
     }
 
-    public QueryCondition convention(QueryCondition qc, String queryType) {
+    public QueryCondition wapperQueryCondition(QueryCondition qc, String queryType) {
+        if (qc == null) {
+            qc = new QueryCondition();
+        }
 
         if (KungfuConstant.QUERY_TYPE_PAGE.equals(queryType)) {
             if (KungfuKit.isNullOrEmpty(qc.getPageNumber())) {
@@ -274,7 +258,7 @@ public class KungfuController extends Controller {
 
         QueryCondition qc = toDTO(QueryCondition.class);
 
-        qc = convention(qc, KungfuConstant.QUERY_TYPE_PAGE);
+        qc = wapperQueryCondition(qc, KungfuConstant.QUERY_TYPE_PAGE);
 
         Page<Record> page = service.queryPage(qc, clazz);
 
@@ -315,15 +299,32 @@ public class KungfuController extends Controller {
         if (StrKit.isBlank(ids)) {
             return R.fail(661, "删除记录ids为空");
         }
-        Long[] idsArray = toArray(ids, Long::new);
-        Table table = getTable(clazz);
-        for (Long id : idsArray) {
-            if (!Db.deleteById(table.getName(), id)) {
-                return R.fail("删除失败");
+        // 事务控制
+        boolean flag = Db.tx(() -> {
+            Long[] idsArray = toArray(ids, Long::new);
+            Table table = getTable(clazz);
+            for (Long id : idsArray) {
+                if (!Db.deleteById(table.getName(), id)) {
+                    return false;
+                }
             }
-        }
+            return true;
+        });
 
-        return R.ok("删除成功");
+        return flag ? R.ok("删除成功") : R.fail("删除失败");
     }
 
+    public <T> void paramValid(T param, String paramName) {
+        if (KungfuKit.isNullOrEmpty(param)) {
+            renderJson(R.fail(640, String.format("%s参数为空", paramName)));
+            return;
+        }
+    }
+
+    public <T> void paramValid(T param, int errorCode, String paramName) {
+        if (KungfuKit.isNullOrEmpty(param)) {
+            renderJson(R.fail(errorCode, String.format("%s参数为空", paramName)));
+            return;
+        }
+    }
 }

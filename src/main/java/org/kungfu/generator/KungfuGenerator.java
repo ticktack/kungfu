@@ -9,6 +9,7 @@ import com.jfinal.plugin.druid.DruidPlugin;
 import com.jfinal.template.Engine;
 import com.jfinal.template.Template;
 import org.kungfu.util.FileKit;
+import org.kungfu.util.KungfuKit;
 
 import java.io.File;
 import java.util.List;
@@ -26,6 +27,10 @@ public class KungfuGenerator {
     protected String serviceTreeTemplate = "/generator/tree_service.tpl";
     protected String controllerTemplate = "/generator/controller.tpl";
     protected String controllerTreeTemplate = "/generator/tree_controller.tpl";
+
+    protected String webApiTemplate = "/generator/web_api.tpl";
+    protected String webIndexTemplate = "/generator/web_index.tpl";
+    protected String webPopupTemplate = "/generator/web_popup.tpl";
     protected final static String LAYERED_BASE_MODEL = "base";
     protected final static String LAYERED_MODEL = "model";
     protected final static String LAYERED_DTO = "dto";
@@ -35,9 +40,13 @@ public class KungfuGenerator {
     protected final static String LAYERED_CONTROLLER = "controller";
     protected final static String LAYERED_TREE_CONTROLLER = "tree_controller";
 
-    private final static String[] LAYERED_ARRAY = new String[]{LAYERED_BASE_MODEL, LAYERED_MODEL, LAYERED_DTO, LAYERED_VALIDATE, LAYERED_SERVICE, LAYERED_CONTROLLER};
+    protected final static String LAYERED_WEB_API = "web_api";
+    protected final static String LAYERED_WEB_INDEX = "web_index";
+    protected final static String LAYERED_WEB_POPUP = "web_popup";
 
-    private final static String[] LAYERED_TREE_ARRAY = new String[]{LAYERED_BASE_MODEL, LAYERED_MODEL, LAYERED_DTO, LAYERED_VALIDATE, LAYERED_TREE_SERVICE, LAYERED_TREE_CONTROLLER};
+    private final static String[] LAYERED_ARRAY = new String[]{LAYERED_BASE_MODEL, LAYERED_MODEL, LAYERED_DTO, LAYERED_VALIDATE, LAYERED_SERVICE, LAYERED_CONTROLLER, LAYERED_WEB_API, LAYERED_WEB_INDEX, LAYERED_WEB_POPUP};
+
+    private final static String[] LAYERED_TREE_ARRAY = new String[]{LAYERED_BASE_MODEL, LAYERED_MODEL, LAYERED_DTO, LAYERED_VALIDATE, LAYERED_TREE_SERVICE, LAYERED_TREE_CONTROLLER, LAYERED_WEB_API, LAYERED_WEB_INDEX, LAYERED_WEB_POPUP};
 
     private final static String BASE_MODEL_SQL = "select column_name,data_type,column_type,is_nullable,column_default,column_comment from information_schema.`columns` where table_schema='%s' and table_name='%s'";
     private final static String DTO_SQL = BASE_MODEL_SQL + " and column_name not in('pinyin','create_user','create_user_id','create_by','create_dept','create_time','update_user','update_user_id','update_by','update_time','status','is_deleted')";
@@ -83,21 +92,27 @@ public class KungfuGenerator {
         // 支持用户自定义模板
         switch (templateType) {
             case LAYERED_BASE_MODEL:
-                return getTemplateByType(isBlank, templateMap, this.LAYERED_BASE_MODEL,this.baseModelTemplate);
+                return getTemplateByType(isBlank, templateMap, LAYERED_BASE_MODEL,this.baseModelTemplate);
             case LAYERED_MODEL:
-                return getTemplateByType(isBlank, templateMap, this.LAYERED_MODEL, this.modelTemplate);
+                return getTemplateByType(isBlank, templateMap, LAYERED_MODEL, this.modelTemplate);
             case LAYERED_DTO:
-                return getTemplateByType(isBlank, templateMap, this.LAYERED_DTO, this.dtoTemplate);
+                return getTemplateByType(isBlank, templateMap, LAYERED_DTO, this.dtoTemplate);
             case LAYERED_VALIDATE:
-                return getTemplateByType(isBlank, templateMap, this.LAYERED_VALIDATE, this.validateTemplate);
+                return getTemplateByType(isBlank, templateMap, LAYERED_VALIDATE, this.validateTemplate);
             case LAYERED_SERVICE:
-                return getTemplateByType(isBlank, templateMap, this.LAYERED_SERVICE, this.serviceTemplate);
+                return getTemplateByType(isBlank, templateMap, LAYERED_SERVICE, this.serviceTemplate);
             case LAYERED_CONTROLLER:
-                return getTemplateByType(isBlank, templateMap, this.LAYERED_CONTROLLER, this.controllerTemplate);
+                return getTemplateByType(isBlank, templateMap, LAYERED_CONTROLLER, this.controllerTemplate);
             case LAYERED_TREE_SERVICE:
-                return getTemplateByType(isBlank, templateMap, this.LAYERED_TREE_SERVICE, this.serviceTreeTemplate);
+                return getTemplateByType(isBlank, templateMap, LAYERED_TREE_SERVICE, this.serviceTreeTemplate);
             case LAYERED_TREE_CONTROLLER:
-                return getTemplateByType(isBlank, templateMap, this.LAYERED_TREE_CONTROLLER, this.controllerTreeTemplate);
+                return getTemplateByType(isBlank, templateMap, LAYERED_TREE_CONTROLLER, this.controllerTreeTemplate);
+            case LAYERED_WEB_API:
+                return getTemplateByType(isBlank, templateMap, LAYERED_WEB_API, this.webApiTemplate);
+            case LAYERED_WEB_INDEX:
+                return getTemplateByType(isBlank, templateMap, LAYERED_WEB_INDEX, this.webIndexTemplate);
+            case LAYERED_WEB_POPUP:
+                return getTemplateByType(isBlank, templateMap, LAYERED_WEB_POPUP, this.webPopupTemplate);
         }
 
         throw new IllegalArgumentException("template name error.");
@@ -108,7 +123,12 @@ public class KungfuGenerator {
         String className = StrKit.firstCharToUpperCase(StrKit.toCamelCase(tableName));
         String filePath = "";
         String basePath = System.getProperty("user.dir") + String.format("/src/main/java/%s/modules", basePackage.replaceAll("\\.", "/"));
-        Kv kv = Kv.by("moduleName", moduleName).set("tableName", tableName).set("tableComment", tableComment).set("basePackage", basePackage);
+        String webBasePath = System.getProperty("user.dir") + "/src/main/webapp/";
+        String packageName = String.format("%s.modules.%s.controller", basePackage, moduleName); // 包名
+        Kv kv = Kv.by("moduleName", moduleName)
+                .set("tableName", tableName)
+                .set("tableComment", tableComment)
+                .set("basePackage", basePackage);
 
         switch (layeredType) {
             case LAYERED_BASE_MODEL:
@@ -116,13 +136,13 @@ public class KungfuGenerator {
                 List<Record> list = Db.find(String.format(BASE_MODEL_SQL, databaseName, tableName));
                 kv.set("columnList", list);
                 filePath = String.format("%s/%s/model/base/Base%s.java", basePath, moduleName, className);
-                template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_BASE_MODEL));
+                template = engine.getTemplate(codeTemplate(templateMap,LAYERED_BASE_MODEL));
                 break;
 
             case LAYERED_MODEL:
                 mkdir(String.format("%s/%s/model", basePath, moduleName));
                 filePath = String.format("%s/%s/model/%s.java", basePath, moduleName, className);
-                template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_MODEL));
+                template = engine.getTemplate(codeTemplate(templateMap,LAYERED_MODEL));
                 break;
 
             case LAYERED_DTO:
@@ -130,7 +150,7 @@ public class KungfuGenerator {
                 List<Record> dtoList = Db.find(String.format(DTO_SQL, databaseName, tableName));
                 kv.set("columnList", dtoList);
                 filePath = String.format("%s/%s/dto/%sDTO.java", basePath, moduleName, className);
-                template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_DTO));
+                template = engine.getTemplate(codeTemplate(templateMap,LAYERED_DTO));
                 break;
 
             case LAYERED_VALIDATE:
@@ -138,33 +158,44 @@ public class KungfuGenerator {
                 List<Record> columnList = Db.find(String.format(DTO_SQL, databaseName, tableName));
                 kv.set("columnList", columnList);
                 filePath = String.format("%s/%s/validate/%sValidator.java", basePath, moduleName, className);
-                template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_VALIDATE));
+                template = engine.getTemplate(codeTemplate(templateMap,LAYERED_VALIDATE));
                 break;
 
             case LAYERED_SERVICE:
                 mkdir(String.format("%s/%s/service", basePath, moduleName));
                 filePath = String.format("%s/%s/service/%sService.java", basePath, moduleName, className);
-                template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_SERVICE));
+                template = engine.getTemplate(codeTemplate(templateMap,LAYERED_SERVICE));
                 break;
 
             case LAYERED_CONTROLLER:
                 mkdir(String.format("%s/%s/controller", basePath, moduleName));
                 kv.set("basePath", tableName.replaceAll("_", "-"));
                 filePath = String.format("%s/%s/controller/%sController.java", basePath, moduleName, className);
-                template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_CONTROLLER));
+                template = engine.getTemplate(codeTemplate(templateMap, LAYERED_CONTROLLER));
                 break;
 
             case LAYERED_TREE_SERVICE:
                 mkdir(String.format("%s/%s/service", basePath, moduleName));
                 filePath = String.format("%s/%s/service/%sService.java", basePath, moduleName, className);
-                template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_TREE_SERVICE));
+                template = engine.getTemplate(codeTemplate(templateMap,LAYERED_TREE_SERVICE));
                 break;
 
             case LAYERED_TREE_CONTROLLER:
                 mkdir(String.format("%s/%s/controller", basePath, moduleName));
                 kv.set("basePath", tableName.replaceAll("_", "-"));
                 filePath = String.format("%s/%s/controller/%sController.java", basePath, moduleName, className);
-                template = engine.getTemplate(codeTemplate(templateMap,this.LAYERED_TREE_CONTROLLER));
+                template = engine.getTemplate(codeTemplate(templateMap,LAYERED_TREE_CONTROLLER));
+                break;
+
+            case LAYERED_WEB_API:
+                mkdir(String.format("%s/api", webBasePath));
+                String apiPath = tableName.replaceAll("_", "-");
+                String webModule = tableName.substring(tableName.indexOf("_") + 1);
+                kv.set("basePath", apiPath);
+                kv.set("webModule", KungfuKit.lineToHump(webModule));
+                kv.set("apiMethods", KungfuKit.apiMethods(packageName));
+                filePath = String.format("%s/api/%s.ts", webBasePath, apiPath);
+                template = engine.getTemplate(codeTemplate(templateMap,LAYERED_WEB_API));
                 break;
         }
 
