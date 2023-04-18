@@ -10,8 +10,8 @@ A library for building RESTful web services specifically designed for use with J
 6. more...
 
 
-## 依赖引用
-使用方法：
+## dependency
+usage ：
 ```
 <dependency>
   <groupId>io.github.ticktack</groupId>
@@ -21,5 +21,5 @@ A library for building RESTful web services specifically designed for use with J
 
 ```
  
-maven中央库位置：
+maven repository ：
 http://mvnrepository.com/artifact/io.github.ticktack/kungfu
