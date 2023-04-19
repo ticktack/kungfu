@@ -11,9 +11,9 @@ A library for building RESTful web services specifically designed for use with J
 
 ## Code Address
 
-Gitee：https://gitee.com/HalseySpicy/Geeker-Admin
+Gitee：https://gitee.com/yfq2010/kungfu
 
-GitHub：https://github.com/HalseySpicy/Geeker-Admin
+GitHub：https://github.com/ticktack/kungfu
 
 ## Dependency
 usage ：
