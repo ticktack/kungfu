@@ -9,8 +9,13 @@ A library for building RESTful web services specifically designed for use with J
 5. Speed up Service layer develop.
 6. more...
 
+## Code Address
 
-## dependency
+Gitee：https://gitee.com/HalseySpicy/Geeker-Admin
+
+GitHub：https://github.com/HalseySpicy/Geeker-Admin
+
+## Dependency
 usage ：
 ```
 <dependency>
@@ -21,5 +26,5 @@ usage ：
 
 ```
  
-maven repository ：
+Maven Repository ：
 http://mvnrepository.com/artifact/io.github.ticktack/kungfu
