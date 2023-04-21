@@ -25,14 +25,11 @@ public class KungfuController extends Controller {
         Map<String, Object> map = JSON.parseObject(json, Map.class);
         Map<String, Object> result = new HashMap<>();
 
-        Iterator it = map.keySet().iterator();
-        while (it.hasNext()) {
-            String key = (String) it.next();
+        for (String key : map.keySet()) {
             if (key.contains("_")) {
                 // key line to hump style
                 result.put(KungfuKit.lineToHump(key), map.get(key));
-            }
-            else {
+            } else {
                 result.put(key, map.get(key));
             }
         }
@@ -103,7 +100,7 @@ public class KungfuController extends Controller {
     public UserInfo getUserInfo() {
         String userName = getHeader("userName");
         String userIdStr = getHeader("userId");
-        Long userId = 0L;
+        long userId = 0L;
         if (StrKit.notBlank(userName)) {
             try {
                 userName = URLDecoder.decode(userName, "UTF-8");

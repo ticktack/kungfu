@@ -34,11 +34,27 @@ public class KungfuService <M extends Model<M>> {
         return TableMapping.me().getTable(clazz);
     }
 
-    public String buildQuerySql(QueryCondition qc, Model<M> model, Class<? extends Model> clazz, String buildQueryType) {
+    public String buildQuerySql(QueryCondition qc, Model<M> model, Class<? extends Model<M>> clazz, String buildQueryType) {
         Table table = getTable(clazz);
         String selectSql = String.format("select * from %s where 1=1", table.getName());
-        String orderBySql = KungfuConstant.QUERY_TYPE_ONE.equals(buildQueryType) ? "" :
-                String.format(" order by %s %s", KungfuKit.humpToLine(qc.getOrderColumnName()), StrKit.isBlank(qc.getOrderBy()) ? "asc" : qc.getOrderBy());
+        String orderBySql = "";
+        if (!KungfuConstant.QUERY_TYPE_ONE.equals(buildQueryType)) {
+            if (!qc.getOrderColumnName().contains(",")) {
+                orderBySql = String.format(" order by %s %s", KungfuKit.humpToLine(qc.getOrderColumnName()), StrKit.isBlank(qc.getOrderBy()) ? "asc" : qc.getOrderBy());
+            }
+            else {
+                StringBuilder sb = new StringBuilder();
+                sb.append(" order by");
+                String[] orderByColumns = qc.getOrderColumnName().split(",");
+                String[] orderByTypes = qc.getOrderBy().split(",");
+                for (int i = 0; i < orderByColumns.length; i++) {
+                    sb.append(String.format(" %s %s,", KungfuKit.humpToLine(orderByColumns[i]), orderByTypes[i]));
+                }
+                sb.deleteCharAt(sb.toString().length() - 1);
+
+                orderBySql = sb.toString();
+            }
+        }
 
         if (model == null) {
             return selectSql + orderBySql;
@@ -96,7 +112,7 @@ public class KungfuService <M extends Model<M>> {
         return selectSql + whereSql.toString() + orderBySql;
     }
 
-    private DbTemplate query(QueryCondition qc, Class<? extends Model> clazz, String buildQueryType) {
+    private DbTemplate query(QueryCondition qc, Class<? extends Model<M>> clazz, String buildQueryType) {
 
         if (qc.getModelMap() == null || qc.getModelMap().isEmpty()) {
             String pageSql = buildQuerySql(qc, null, clazz, buildQueryType);
@@ -112,21 +128,21 @@ public class KungfuService <M extends Model<M>> {
         return Db.templateByString(pageSql, params);
     }
 
-    public Page<Record> queryPage(QueryCondition qc, Class<? extends Model> clazz) {
+    public Page<Record> queryPage(QueryCondition qc, Class<? extends Model<M>> clazz) {
 
         DbTemplate dbTemplate = query(qc, clazz, KungfuConstant.QUERY_TYPE_PAGE);
 
         return dbTemplate.paginate(qc.getPageNumber(), qc.getPageSize());
     }
 
-    public List<Record> queryList(QueryCondition qc, Class<? extends Model> clazz) {
+    public List<Record> queryList(QueryCondition qc, Class<? extends Model<M>> clazz) {
 
         DbTemplate dbTemplate = query(qc, clazz, KungfuConstant.QUERY_TYPE_LIST);
 
         return dbTemplate.find();
     }
 
-    public Record queryOne(QueryCondition qc, Class<? extends Model> clazz) {
+    public Record queryOne(QueryCondition qc, Class<? extends Model<M>> clazz) {
 
         DbTemplate dbTemplate = query(qc, clazz, KungfuConstant.QUERY_TYPE_ONE);
 
@@ -136,9 +152,7 @@ public class KungfuService <M extends Model<M>> {
 
     private List<Record> getChildListById(List<Record> list, Record t) {
         List<Record> childList = new ArrayList<>();
-        Iterator<Record> it = list.iterator();
-        while (it.hasNext()) {
-            Record next = it.next();
+        for (Record next : list) {
             if (StrKit.notNull(next.getLong("pid")) && next.getLong("pid").longValue() == t.getLong("id").longValue()) {
                 childList.add(next);
             }
@@ -148,9 +162,7 @@ public class KungfuService <M extends Model<M>> {
 
     private List<Record> getChildListByCode(List<Record> list, Record t, String codeName) {
         List<Record> childList = new ArrayList<>();
-        Iterator<Record> it = list.iterator();
-        while (it.hasNext()) {
-            Record next = it.next();
+        for (Record next : list) {
             if (StrKit.notNull(next.getStr("parentCode")) && next.getStr("parentCode").equals(t.getStr(codeName))) {
                 childList.add(next);
             }
@@ -159,7 +171,7 @@ public class KungfuService <M extends Model<M>> {
     }
 
     private boolean hasChild(List<Record> list, Record t, String useIdOrCode) {
-        return (useIdOrCode == null ? getChildListById(list, t).size() > 0 : getChildListByCode(list, t, useIdOrCode).size() > 0) ? true : false;
+        return useIdOrCode == null ? getChildListById(list, t).size() > 0 : getChildListByCode(list, t, useIdOrCode).size() > 0;
     }
 
     private void recursion(List<Record> list, Record t, String useIdOrCode) {
@@ -172,9 +184,7 @@ public class KungfuService <M extends Model<M>> {
 
             if (hasChild(list, treeChild, useIdOrCode)) {
                 // 判断是否有子节点
-                Iterator<Record> it = childList.iterator();
-                while (it.hasNext()) {
-                    Record next = it.next();
+                for (Record next : childList) {
                     recursion(list, next, useIdOrCode);
                 }
             }
@@ -192,8 +202,7 @@ public class KungfuService <M extends Model<M>> {
         for (Record record : treeSourceList) {
             tempList.add(record.getLong("id"));
         }
-        for (Iterator<Record> iterator = treeSourceList.iterator(); iterator.hasNext();) {
-            Record record = iterator.next();
+        for (Record record : treeSourceList) {
             // 如果是顶级节点, 遍历该父节点的所有子节点
             if (!tempList.contains(record.getLong("pid"))) {
                 recursion(treeSourceList, record, null);
@@ -221,8 +230,7 @@ public class KungfuService <M extends Model<M>> {
             tempList.add(record.getStr(codeName));
         }
 
-        for (Iterator<Record> iterator = treeSourceList.iterator(); iterator.hasNext();) {
-            Record record = iterator.next();
+        for (Record record : treeSourceList) {
             // 如果是顶级节点, 遍历该父节点的所有子节点
             if (!tempList.contains(record.getStr("parentCode"))) {
                 recursion(treeSourceList, record, codeName);
@@ -245,4 +253,35 @@ public class KungfuService <M extends Model<M>> {
         return root;
     }
 
+    public  R existValid(boolean isSave, Model<M> model, String codeAttr, String nameAttr) {
+        Table table = getTable(model.getClass());
+        String sql = String.format("select * from %s where %s=? or %s=?", table.getName(), codeAttr, nameAttr);
+
+        if (isSave) {
+            Record exist = Db.findFirst(sql, model.getStr(codeAttr), model.getStr(codeAttr));
+            if (exist != null) {
+                return R.fail(631, String.format("编码为'%s'已存在，请重新输入", model.getStr(codeAttr)));
+            }
+
+            exist = Db.findFirst(sql, model.getStr(nameAttr), model.getStr(nameAttr));
+            if (exist != null) {
+                return R.fail(632, String.format("名称为'%s'已存在，请重新输入", model.getStr(nameAttr)));
+            }
+        }
+
+        return R.ok();
+    }
+
+    public static void main(String[] args) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" order by");
+        String[] orderByColumns = "id,dict_code,display_no".split(",");
+        String[] orderByTypes = "asc,desc,asc".split(",");
+        for (int i = 0; i < orderByColumns.length; i++) {
+            sb.append(String.format(" %s %s,", orderByColumns[i], orderByTypes[i]));
+        }
+        sb.deleteCharAt(sb.toString().length() - 1);
+
+        System.out.println(sb.toString());
+    }
 }
