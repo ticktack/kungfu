@@ -156,7 +156,7 @@ public class KungfuController extends Controller {
     }
 
     public Timestamp toTimestamp(String key) {
-        return StrKit.isBlank(getRequestBody()) ? null : JSON.parseObject(getRequestBody()).getTimestamp(key);
+        return StrKit.isBlank(getRequestBody()) ? null : (Timestamp) JSON.parseObject(getRequestBody()).getTimestamp(key);
     }
 
     public <T> T toParam(String key, Function<String, T> mapper) {
