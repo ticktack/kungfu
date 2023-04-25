@@ -272,16 +272,4 @@ public class KungfuService <M extends Model<M>> {
         return R.ok();
     }
 
-    public static void main(String[] args) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(" order by");
-        String[] orderByColumns = "id,dict_code,display_no".split(",");
-        String[] orderByTypes = "asc,desc,asc".split(",");
-        for (int i = 0; i < orderByColumns.length; i++) {
-            sb.append(String.format(" %s %s,", orderByColumns[i], orderByTypes[i]));
-        }
-        sb.deleteCharAt(sb.toString().length() - 1);
-
-        System.out.println(sb.toString());
-    }
 }

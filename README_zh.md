@@ -21,7 +21,7 @@ usage ：
 <dependency>
   <groupId>io.github.ticktack</groupId>
   <artifactId>kungfu</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
 </dependency>
 
 ```

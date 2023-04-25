@@ -250,6 +250,41 @@ public class KungfuController extends Controller {
         return qc;
     }
 
+    public QueryCondition wapperQueryCondition(QueryCondition qc, Triple<String, String, String> paramTriple) {
+        qc = initQueryCondition(qc);
+
+        qc.getModelMap().put(paramTriple.getFirst(), paramTriple.getSecond());
+        qc.getQueryTypeMap().put(paramTriple.getFirst(), paramTriple.getThird());
+
+        return qc;
+    }
+
+    private QueryCondition initQueryCondition(QueryCondition qc) {
+        if (qc == null) {
+            qc = new QueryCondition();
+        }
+
+        Map<String, Object> modelMap = qc.getModelMap() == null ? new HashMap<>() : qc.getModelMap();
+        Map<String, String> queryTypeMap = qc.getQueryTypeMap() == null ? new HashMap<>() : qc.getQueryTypeMap();
+
+        qc.setModelMap(modelMap);
+        qc.setQueryTypeMap(queryTypeMap);
+
+        return qc;
+    }
+
+    public QueryCondition wapperQueryCondition(QueryCondition qc, List<Triple<String, String, String>> paramTripleList) {
+
+        qc = initQueryCondition(qc);
+
+        for (Triple<String, String, String> paramTriple : paramTripleList) {
+            qc.getModelMap().put(paramTriple.getFirst(), paramTriple.getSecond());
+            qc.getQueryTypeMap().put(paramTriple.getFirst(), paramTriple.getThird());
+        }
+
+        return qc;
+    }
+
 
     public Page<Record> queryPage(Class<? extends Model> clazz) {
 
@@ -262,6 +297,14 @@ public class KungfuController extends Controller {
         return page == null ? null : toHumpRecordPage(page);
     }
 
+    public Page<Record> queryPage(Class<? extends Model> clazz, QueryCondition qc) {
+
+        qc = wapperQueryCondition(qc, KungfuConstant.QUERY_TYPE_PAGE);
+
+        Page<Record> page = service.queryPage(qc, clazz);
+
+        return page == null ? null : toHumpRecordPage(page);
+    }
 
     protected Table getTable(Class<? extends Model> clazz) {
         return TableMapping.me().getTable(clazz);
