@@ -1,13 +1,28 @@
 ![image](https://youyayisheng.oss-cn-beijing.aliyuncs.com/kungfu/@/logo.png)
 
-一个专为JFinal设计的构建RESTful Web服务的急速开发库。
+一个优雅的 JFinal 增强框架，值得拥有。
+
+## 官网
+https://kungfu.wang/
+
 ## 特性
-1. 能够快速构建 JFinal RESTful API 项目。
-2. 支持代码生成能力，使用极度简单及灵活，常规的代码帮您写。
-3. 支持动态构建查询SQL语句。
-4. 加速Controller层开发的速度及体验。
-5. 加速Service层开发的速度及体验。
-6. 更多特性等你发现...
+### 易学易用
+基于 JFinal 构建标准 MVC Java Web 项目，提供极易上手的开发库封装和标准接口文档。
+
+### 强大脚手架
+提供代码生成能力，使用极度简单而不失灵活和强大，分层代码帮您一键生成。
+
+### 极大简化CRUD
+支持动态参数自动构建查询SQL语句，给开发者带来极度酸爽的开发体验。
+
+### 灵活可控
+权限、请求参数重复获取、无状态服务、类型转换帮你全搞定，也可以高度DIY。
+
+### 加速控制层开发
+提供灵活的参数获取、校验、转换能力，异常及结果的标准化。真正做到专注于业务开发。
+
+### 加速服务层开发
+支持动态参数解析成动态查询、树结构查询及存在性查询。代码变得简单优雅而不失功能。
 
 ## 代码仓库
 
@@ -21,7 +36,7 @@ usage ：
 <dependency>
   <groupId>io.github.ticktack</groupId>
   <artifactId>kungfu</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.2</version>
 </dependency>
 
 ```
