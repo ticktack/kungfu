@@ -13,7 +13,7 @@ public class TokenKit {
     //设置过期时间 7days
     private static final long EXPIRE_DATE = 7*24*60*60*1000;
     //token秘钥
-    private static final String TOKEN_SECRET = "ZCfasfhuaUUHufguGuwu2020BQWE";
+    private static final String TOKEN_SECRET = "AZfasfhuaKungfuuGuwu2023NBNS";
  
     public static String token (String phoneNo, String code){
  
