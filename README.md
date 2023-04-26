@@ -1,6 +1,6 @@
 ![image](https://youyayisheng.oss-cn-beijing.aliyuncs.com/kungfu/@/logo.png)
 
-A library for building RESTful web services specifically designed for use with JFinal.
+An elegant JFinal enhancement framework that is worth having.
 
 ## Official website
 
