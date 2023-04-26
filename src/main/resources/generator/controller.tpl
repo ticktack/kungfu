@@ -41,10 +41,8 @@ public class #(className)Controller extends KungfuController {
     })
     @ApiResCustom(ResultVO.class)
     @Before(#(className)Validator.class)
-    @CacheName("#(camelCaseName)")
     public void saveOrUpdate() {
         #(className) #(camelCaseName) = toModel(#(className).class);
-        CacheKit.removeAll("#(camelCaseName)");
         renderJson(#(camelCaseName)Service.saveOrUpdate(#(camelCaseName), getUserInfo()));
     }
 

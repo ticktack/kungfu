@@ -43,9 +43,9 @@ public class #(className)Controller extends KungfuController {
         String searchName = get("searchName");
 
         // 缓存
-        List<#(className)> #(camelCaseName)Tree = CacheKit.get("#(camelCaseName)", "#(camelCaseName)Tree", () -> #(camelCaseName)Service.buildTree(searchName));
+        Record #(camelCaseName)Tree = CacheKit.get("#(camelCaseName)", "#(camelCaseName)Tree", () -> #(camelCaseName)Service.buildTree(searchName));
 
-        renderJson(R.ok("#(camelCaseName)Tree", #(camelCaseName)Tree));
+        renderJson(R.ok("data", #(camelCaseName)Tree));
     }
 
     @ApiOperation(value = "#(tableComment)信息保存或修改", notes = "根据表单内容保存或更新内容", httpMethod = ApiEnum.METHOD_POST, produces = ApiEnum.PRODUCES_JSON)

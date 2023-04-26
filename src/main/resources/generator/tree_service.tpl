@@ -21,7 +21,7 @@ import java.util.List;
 #set(codeColumnName=getCodeColumnName(tableName))
 #set(tableComment=tableComment.replace("表",""))
 public class #(className)Service extends KungfuService<#(className)> {
-    private #(className) dao = #(className).dao;
+    private final #(className) dao = #(className).dao;
 
     public Record buildTree(String queryName) {
         String sql = "select * from #(tableName) order by display_no";

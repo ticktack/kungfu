@@ -18,25 +18,34 @@ public class #(className)Validator extends Validator {
         setRet(Ret.fail().set("code", 680));
 
         String json = c.getAttr(KungfuConstant.JSON_REQUEST_BODY);
-        #(className) #(camelCaseName) = KungfuKit.toModel(json, #(className).class);
+        try {
+            #(className) #(camelCaseName) = KungfuKit.toModelValidator(json, #(className).class);
 
-        #for(column : columnList)
-        #set(columnName=(toCamelCase(column.column_name)))
-        #set(upperCaseColumnName=firstCharToUpperCase(toCamelCase(column.column_name)))
-        #set(javaType=toJavaType(column.data_type, column.column_type))
-        #set(javaMethod=toJavaMethod(column.data_type, column.column_type))
-        #if("NO".equals(column.is_nullable) && !"id".equals(column.column_name) && !"pinyin".equals(column.column_name) && isBlank(column.column_default))
-        #if("varchar".equals(column.data_type))
-        if (StrKit.isBlank(#(camelCaseName).get#(upperCaseColumnName)())) {
-            addError(KungfuConstant.MASSAGE, "#(className)对象属性#(columnName)不能为空");
+            if (#(camelCaseName) == null) {
+                addError(KungfuConstant.MASSAGE, "#(className)对象不能为空");
+            }
+            else {
+                #for(column : columnList)
+                #set(columnName=(toCamelCase(column.column_name)))
+                #set(upperCaseColumnName=firstCharToUpperCase(toCamelCase(column.column_name)))
+                #set(javaType=toJavaType(column.data_type, column.column_type))
+                #set(javaMethod=toJavaMethod(column.data_type, column.column_type))
+                #if("NO".equals(column.is_nullable) && !"id".equals(column.column_name) && !"pinyin".equals(column.column_name) && (column.column_default == null || ("0".equals(column.column_default) && "bigint".equals(column.data_type))))
+                #if("varchar".equals(column.data_type))
+                if (StrKit.isBlank(#(camelCaseName).get#(upperCaseColumnName)())) {
+                    addError(KungfuConstant.MASSAGE, "#(className)对象属性#(columnName)不能为空");
+                }
+                #else
+                if (#(camelCaseName).get#(upperCaseColumnName)() == null) {
+                    addError(KungfuConstant.MASSAGE, "#(className)对象属性#(columnName)不能为空");
+                }
+                #end
+                #end
+                #end
+            }
+        } catch (Exception e) {
+            addError(KungfuConstant.MASSAGE, e.getMessage());
         }
-        #else
-        if (#(camelCaseName).get#(upperCaseColumnName)() == null) {
-            addError(KungfuConstant.MASSAGE, "#(className)对象属性#(columnName)不能为空");
-        }
-        #end
-        #end
-        #end
     }
 
     @Override

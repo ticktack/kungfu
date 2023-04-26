@@ -9,8 +9,10 @@ import org.kungfu.core.KungfuService;
 import org.kungfu.core.R;
 import org.kungfu.core.UserInfo;
 
+import java.util.Date;
+
 public class #(className)Service extends KungfuService<#(className)> {
-    private #(className) dao = #(className).dao;
+    private final #(className) dao = #(className).dao;
 
     public R saveOrUpdate(#(className) #(camelCaseName), UserInfo userInfo) {
 
@@ -24,6 +26,7 @@ public class #(className)Service extends KungfuService<#(className)> {
             #(camelCaseName).setUpdateUserId(userInfo.getUserId());
             #(camelCaseName).setUpdateTime(date);
             if (#(camelCaseName).update()) {
+                //CacheKit.remove("#(camelCaseName)", "#(camelCaseName)Tree");
                 return R.ok("更新成功");
             }
 
@@ -35,6 +38,7 @@ public class #(className)Service extends KungfuService<#(className)> {
             #(camelCaseName).setCreateTime(date);
 
             if (#(camelCaseName).save()) {
+                //CacheKit.removeAll("#(camelCaseName)");
                 return R.ok("保存成功");
             }
 
