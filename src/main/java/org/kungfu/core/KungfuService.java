@@ -272,4 +272,18 @@ public class KungfuService <M extends Model<M>> {
         return R.ok();
     }
 
+    public  R existValid(boolean isSave, Model<M> model, String codeAttr) {
+        Table table = getTable(model.getClass());
+        String sql = String.format("select * from %s where %s=?", table.getName(), codeAttr);
+
+        if (isSave) {
+            Record exist = Db.findFirst(sql, model.getStr(codeAttr));
+            if (exist != null) {
+                return R.fail(631, String.format("编码为'%s'已存在，请重新输入", model.getStr(codeAttr)));
+            }
+        }
+
+        return R.ok();
+    }
+
 }
