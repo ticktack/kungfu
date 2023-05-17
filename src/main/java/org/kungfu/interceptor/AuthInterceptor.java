@@ -17,6 +17,11 @@ public class AuthInterceptor implements Interceptor {
 		if (controller.getViewPath().contains("/swagger/")) {
 			inv.invoke();
 		}
+
+		else if (controller.getViewPath().contains("/user-login/")) {
+			inv.invoke();
+		}
+
 		// 方便本地调试
 		else if (PropKit.getBoolean("isLocal", false)) {
 			inv.invoke();
