@@ -15,14 +15,14 @@ public class TokenKit {
     //token秘钥
     private static final String TOKEN_SECRET = "AZfasfhuaKungfuuGuwu2023NBNS";
  
-    public static String token (String phoneNo, String code){
+    public static String token(String phoneNo, String code, String tokenSecret, long expireTime){
  
         String token = "";
         try {
             //过期时间
-            Date date = new Date(System.currentTimeMillis()+EXPIRE_DATE);
+            Date date = new Date(System.currentTimeMillis() + expireTime);
             //秘钥及加密算法
-            Algorithm algorithm = Algorithm.HMAC256(TOKEN_SECRET);
+            Algorithm algorithm = Algorithm.HMAC256(tokenSecret);
             //设置头部信息
             Map<String,Object> header = new HashMap<>();
             header.put("typ","JWT");
@@ -38,6 +38,18 @@ public class TokenKit {
             return  null;
         }
         return token;
+    }
+
+    public static String token(String phoneNo, String code, String tokenSecret) {
+        return token(phoneNo, code, tokenSecret, EXPIRE_DATE);
+    }
+
+    public static String token(String phoneNo, String code, long expireTime) {
+        return token(phoneNo, code, TOKEN_SECRET, expireTime);
+    }
+
+    public static String token(String phoneNo, String code) {
+        return token(phoneNo, code, TOKEN_SECRET, EXPIRE_DATE);
     }
  
     @SuppressWarnings("unused")
