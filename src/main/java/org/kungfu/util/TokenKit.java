@@ -51,15 +51,15 @@ public class TokenKit {
     public static String token(String phoneNo, String code) {
         return token(phoneNo, code, TOKEN_SECRET, EXPIRE_DATE);
     }
- 
-    @SuppressWarnings("unused")
-	public static boolean verify(String token){
-        /**
-         * @desc   验证token，通过返回true
-         * @params [token]需要校验的串
-         **/
+
+    public static boolean verify(String token) {
+        return verify(token, TOKEN_SECRET);
+    }
+
+	public static boolean verify(String token, String tokenSecret) {
+
         try {
-            Algorithm algorithm = Algorithm.HMAC256(TOKEN_SECRET);
+            Algorithm algorithm = Algorithm.HMAC256(tokenSecret);
             JWTVerifier verifier = JWT.require(algorithm).build();
             DecodedJWT jwt = verifier.verify(token);
             return true;
