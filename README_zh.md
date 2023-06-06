@@ -36,7 +36,7 @@ usage ：
 <dependency>
   <groupId>io.github.ticktack</groupId>
   <artifactId>kungfu</artifactId>
-  <version>1.2.7</version>
+  <version>1.2.8</version>
 </dependency>
 
 ```

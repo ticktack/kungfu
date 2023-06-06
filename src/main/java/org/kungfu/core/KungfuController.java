@@ -250,7 +250,7 @@ public class KungfuController extends Controller {
         return qc;
     }
 
-    public QueryCondition wapperQueryCondition(QueryCondition qc, Triple<String, String, String> paramTriple) {
+    public QueryCondition wapperQueryCondition(QueryCondition qc, Triple<String, Object, String> paramTriple) {
         qc = initQueryCondition(qc);
 
         qc.getModelMap().put(paramTriple.getFirst(), paramTriple.getSecond());
