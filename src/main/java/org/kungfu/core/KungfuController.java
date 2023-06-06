@@ -273,18 +273,17 @@ public class KungfuController extends Controller {
         return qc;
     }
 
-    public QueryCondition wapperQueryCondition(QueryCondition qc, List<Triple<String, String, String>> paramTripleList) {
+    public QueryCondition wapperQueryCondition(QueryCondition qc, List<Triple<String, Object, String>> paramTripleList) {
 
         qc = initQueryCondition(qc);
 
-        for (Triple<String, String, String> paramTriple : paramTripleList) {
+        for (Triple<String, Object, String> paramTriple : paramTripleList) {
             qc.getModelMap().put(paramTriple.getFirst(), paramTriple.getSecond());
             qc.getQueryTypeMap().put(paramTriple.getFirst(), paramTriple.getThird());
         }
 
         return qc;
     }
-
 
     public Page<Record> queryPage(Class<? extends Model> clazz) {
 
