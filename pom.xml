@@ -47,8 +47,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jfinal-version>5.0.8</jfinal-version>
-        <jfinal-undertow-version>3.4</jfinal-undertow-version>
+        <jfinal-version>5.1.1</jfinal-version>
+        <jfinal-undertow-version>3.5</jfinal-undertow-version>
         <fastjson-version>1.2.83</fastjson-version>
         <java-jwt-version>3.8.2</java-jwt-version>
         <jfinal-swagger-knife4j-version>3.0.0</jfinal-swagger-knife4j-version>
