@@ -134,7 +134,13 @@ public class KungfuKit {
                     M r = record;
                     String[] attrs = r._getAttrNames();
                     r._setOrPut(toHump(record.toJson()));
-                    r.remove(attrs);
+                    //r.remove(attrs);
+                    for (String attr : attrs) {
+                        if (attr.contains("_")) {
+                            r.remove(attr);
+                        }
+                    }
+
                     return r;
                 }).collect(Collectors.toList());
 
