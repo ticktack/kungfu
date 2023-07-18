@@ -99,6 +99,7 @@ public class KungfuService <M extends Model<M>> {
                     break;
                 case GREATER_THAN:
                     whereSql.append(String.format(" and %s > #para(%s)", column, key));
+                    break;
                 case LESS_EQUAL:
                     whereSql.append(String.format(" and %s <= #para(%s)", column, key));
                     break;
