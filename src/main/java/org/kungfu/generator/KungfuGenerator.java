@@ -235,6 +235,13 @@ public class KungfuGenerator {
             String tableName = record.getStr("table_name");
             String tableComment = record.getStr("table_comment");
 
+            if (StrKit.isBlank(tableName)) {
+                tableName = record.getStr("TABLE_NAME");
+            }
+            if (StrKit.isBlank(tableComment)) {
+                tableComment = record.getStr("TABLE_COMMENT");
+            }
+
             Record treeTable = Db.findFirst(String.format(IF_TREE_TABLE_SQL, databaseName, tableName));
 
             if (genLayers.length == 0) {
