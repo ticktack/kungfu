@@ -134,7 +134,8 @@ public class KungfuGenerator {
             case LAYERED_BASE_MODEL:
                 mkdir(String.format("%s/%s/model/base", basePath, moduleName));
                 List<Record> list = Db.find(String.format(BASE_MODEL_SQL, databaseName, tableName));
-                kv.set("columnList", list);
+
+                kv.set("columnList", KungfuKit.toLowerCaseRecordList(list));
                 filePath = String.format("%s/%s/model/base/Base%s.java", basePath, moduleName, className);
                 template = engine.getTemplate(codeTemplate(templateMap,LAYERED_BASE_MODEL));
                 break;
@@ -148,7 +149,7 @@ public class KungfuGenerator {
             case LAYERED_DTO:
                 mkdir(String.format("%s/%s/dto", basePath, moduleName));
                 List<Record> dtoList = Db.find(String.format(DTO_SQL, databaseName, tableName));
-                kv.set("columnList", dtoList);
+                kv.set("columnList", KungfuKit.toLowerCaseRecordList(dtoList));
                 filePath = String.format("%s/%s/dto/%sDTO.java", basePath, moduleName, className);
                 template = engine.getTemplate(codeTemplate(templateMap,LAYERED_DTO));
                 break;
@@ -156,7 +157,7 @@ public class KungfuGenerator {
             case LAYERED_VALIDATE:
                 mkdir(String.format("%s/%s/validate", basePath, moduleName));
                 List<Record> columnList = Db.find(String.format(DTO_SQL, databaseName, tableName));
-                kv.set("columnList", columnList);
+                kv.set("columnList", KungfuKit.toLowerCaseRecordList(columnList));
                 filePath = String.format("%s/%s/validate/%sValidator.java", basePath, moduleName, className);
                 template = engine.getTemplate(codeTemplate(templateMap,LAYERED_VALIDATE));
                 break;

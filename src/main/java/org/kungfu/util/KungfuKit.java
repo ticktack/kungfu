@@ -225,4 +225,34 @@ public class KungfuKit {
         }
         return methodsMap;
     }
+
+    public static Map<String, Object> toLowerCase(String json) {
+        try {
+            Map<String, Object> map = (Map<String, Object>) JSON.parse(json);
+            Map<String, Object> newmap = new HashMap<>();
+
+            for (String key : map.keySet()) {
+                newmap.put(key.toLowerCase(), map.get(key));
+            }
+
+            return newmap;
+
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+
+    public static List<Record> toLowerCaseRecordList(List<Record> recordList) {
+        List<Record> dist = new ArrayList<>();
+        for (Record record : recordList) {
+            Record r = new Record();
+            r.setColumns(toLowerCase(record.toJson()));
+            dist.add(r);
+        }
+
+        return dist;
+    }
 }
